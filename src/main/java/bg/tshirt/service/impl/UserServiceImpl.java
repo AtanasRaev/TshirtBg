@@ -4,6 +4,7 @@ import bg.tshirt.database.dto.UserRegistrationDTO;
 import bg.tshirt.database.entity.User;
 import bg.tshirt.database.entity.enums.Role;
 import bg.tshirt.database.repository.UserRepository;
+import bg.tshirt.exceptions.EmailAlreadyInUseException;
 import bg.tshirt.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,8 +28,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void registerUser(UserRegistrationDTO registrationDTO) {
-        if (this.userRepository.existsByEmail(registrationDTO.getEmail())) {
-            throw new IllegalArgumentException("A user with this email already exists.");
+        if (userRepository.existsByEmail(registrationDTO.getEmail())) {
+            throw new EmailAlreadyInUseException("Email is already in use");
         }
 
         Set<Role> roles = determineRoles();
