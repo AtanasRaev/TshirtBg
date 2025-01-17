@@ -1,5 +1,6 @@
 package bg.tshirt.service.impl;
 
+import bg.tshirt.database.dto.UserDTO;
 import bg.tshirt.database.dto.UserRegistrationDTO;
 import bg.tshirt.database.entity.User;
 import bg.tshirt.database.entity.enums.Role;
@@ -44,6 +45,12 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public UserDTO findByEmail(String email) {
+        return this.userRepository.findByEmail(email)
+                .map(user -> new UserDTO(user.getEmail(), user.getAddress()))
+                .orElse(null);
+    }
 
     private Set<Role> determineRoles() {
         Set<Role> roles = new HashSet<>();

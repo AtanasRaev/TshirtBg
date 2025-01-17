@@ -1,25 +1,15 @@
 package bg.tshirt.database.dto;
 
 public class UserDTO {
-    private Long id;
     private String email;
     private String address;
 
     public UserDTO() {
     }
 
-    public UserDTO(Long id, String email, String address) {
-        this.id = id;
+    public UserDTO(String email, String address) {
         this.email = email;
         this.address = address;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getEmail() {

@@ -27,7 +27,6 @@ public class JwtTokenProvider {
     private Key key;
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
-
     @PostConstruct
     public void init() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
@@ -41,7 +40,7 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
-                .setSubject(customUserDetails.getId().toString())
+                .setSubject(customUserDetails.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .claim("roles", customUserDetails.getAuthorities()

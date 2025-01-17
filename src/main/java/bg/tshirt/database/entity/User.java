@@ -4,12 +4,12 @@ import bg.tshirt.database.entity.enums.Role;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -35,7 +35,7 @@ public class User {
     public User(String email, String password, String address, Set<Role> roles) {
         this.email = email;
         this.password = password;
-        this.address = address;
+        this.address = Objects.requireNonNullElse(address, "");
         this.roles = roles;
     }
 
