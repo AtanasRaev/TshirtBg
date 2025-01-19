@@ -1,32 +1,29 @@
 package bg.tshirt.database.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Map;
+import java.util.List;
 
 public class ApiError {
-    private String message;
-    @JsonProperty("validation_errors")
-    private Map<String, String> validationErrors;
+    private String status;
+    private List<String> errors;
 
-    public ApiError(String message, Map<String, String> validationErrors) {
-        this.message = message;
-        this.validationErrors = validationErrors;
+    public ApiError(String status, List<String> errors) {
+        this.status = status;
+        this.errors = errors;
     }
 
-    public String getMessage() {
-        return message;
+    public String getStatus() {
+        return status;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public Map<String, String> getValidationErrors() {
-        return validationErrors;
+    public List<String> getErrors() {
+        return errors;
     }
 
-    public void setValidationErrors(Map<String, String> validationErrors) {
-        this.validationErrors = validationErrors;
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
     }
 }

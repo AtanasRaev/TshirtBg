@@ -22,7 +22,10 @@ public class JwtTokenProvider {
     private String jwtSecret;
 
     @Value("${app.jwtExpirationInMs}")
-    private int jwtExpirationInMs;
+    private long jwtExpirationInMs;
+
+    @Value("${app.jwtRefreshExpirationInMs}")
+    private long jwtRefreshExpirationInMs;
 
     private Key key;
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
@@ -33,7 +36,7 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(Authentication authentication) {
+    public String generateAccessToken(Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
         Date now = new Date();
@@ -47,6 +50,18 @@ public class JwtTokenProvider {
                         .stream()
                         .map(GrantedAuthority::getAuthority)
                         .toList())
+                .signWith(key)
+                .compact();
+    }
+
+    public String generateRefreshToken(String email) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtRefreshExpirationInMs);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
                 .signWith(key)
                 .compact();
     }

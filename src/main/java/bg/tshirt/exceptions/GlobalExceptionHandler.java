@@ -9,32 +9,33 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+        List<String> errors = new LinkedList<>();
 
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errors.put(error.getField(), error.getDefaultMessage());
+            errors.add(error.getDefaultMessage());
         }
 
-        ApiError apiError = new ApiError("Validation failed", errors);
+        ApiError apiError = new ApiError("error", errors);
 
         return ResponseEntity.badRequest().body(apiError);
     }
 
     @ExceptionHandler(EmailAlreadyInUseException.class)
     public ResponseEntity<?> handleEmailAlreadyInUseException(EmailAlreadyInUseException ex) {
-        ApiError apiError = new ApiError(ex.getMessage(), null);
+        ApiError apiError = new ApiError("error", List.of(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid username or password"));
+        ApiError apiError = new ApiError("error", List.of(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
     }
 }

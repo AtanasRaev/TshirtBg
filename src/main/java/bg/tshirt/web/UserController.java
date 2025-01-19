@@ -2,10 +2,7 @@ package bg.tshirt.web;
 
 import bg.tshirt.config.JwtAuthenticationFilter;
 import bg.tshirt.config.JwtTokenProvider;
-import bg.tshirt.database.dto.UserDTO;
-import bg.tshirt.database.dto.UserLoginDTO;
-import bg.tshirt.database.dto.UserRegistrationDTO;
-import bg.tshirt.database.dto.UserResponseDTO;
+import bg.tshirt.database.dto.*;
 import bg.tshirt.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -19,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -77,8 +75,10 @@ public class UserController {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = jwtTokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new UserResponseDTO(jwt, "Registration successful"));
+        String accessToken = jwtTokenProvider.generateAccessToken(authentication);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(registrationDTO.getEmail());
+
+        return ResponseEntity.ok(new UserResponseDTO("success", "Registration successful", accessToken, refreshToken));
     }
 
     @PostMapping("/login")
@@ -91,11 +91,12 @@ public class UserController {
                     )
             );
 
-            String token = jwtTokenProvider.generateToken(authentication);
+            String accessToken = jwtTokenProvider.generateAccessToken(authentication);
+            String refreshToken = jwtTokenProvider.generateRefreshToken(loginRequest.getEmail());
 
-            return ResponseEntity.ok(new UserResponseDTO(token, "Login successful"));
+            return ResponseEntity.ok(new UserResponseDTO("success", "Login successful", accessToken, refreshToken));
         } catch (AuthenticationException ex) {
-            return ResponseEntity.status(401).body(new UserResponseDTO(null, "Invalid username or password"));
+            return ResponseEntity.status(401).body(new ApiError("error", List.of("Invalid username or password")));
         }
     }
 }

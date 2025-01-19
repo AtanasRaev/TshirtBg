@@ -37,3 +37,4 @@ logging:
 app:
   jwtSecret: ${JWT_SECRET}
   jwtExpirationInMs: ${JWT_EXPIRATION_TIME}
+  jwtRefreshExpirationInMs: ${JWT_REFRESH_TIME}

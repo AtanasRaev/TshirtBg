@@ -2,30 +2,16 @@ package bg.tshirt.database.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class UserResponseDTO {
-    private String status;
-
-    private String message;
-
+public class TokenRefreshResponse {
     @JsonProperty("access_token")
     private String accessToken;
 
     @JsonProperty("refresh_token")
     private String refreshToken;
 
-    public UserResponseDTO(String status, String message, String token, String refreshToken) {
-        this.status = status;
-        this.message = message;
-        this.accessToken = token;
+    public TokenRefreshResponse(String accessToken, String refreshToken) {
+        this.accessToken = accessToken;
         this.refreshToken = refreshToken;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public String getAccessToken() {
@@ -36,14 +22,6 @@ public class UserResponseDTO {
         this.accessToken = accessToken;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public String getRefreshToken() {
         return refreshToken;
     }
@@ -52,3 +30,4 @@ public class UserResponseDTO {
         this.refreshToken = refreshToken;
     }
 }
+
