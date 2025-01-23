@@ -3,6 +3,7 @@ package bg.tshirt.exceptions;
 import bg.tshirt.database.dto.ApiError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -37,5 +39,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException ex) {
         ApiError apiError = new ApiError("error", List.of(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleEnumParsingErrors(HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest().body(
+                Map.of("message", "Invalid value provided for enum field. Check your inputs."));
     }
 }

@@ -39,9 +39,7 @@ public class UserController {
     public ResponseEntity<?> getProfile(HttpServletRequest request) {
         String token = this.jwtTokenProvider.getJwtFromRequest(request);
 
-        String currentFingerprint = jwtTokenProvider.generateDeviceFingerprint(request);
-
-        if (token == null || !this.jwtTokenProvider.validateToken(token, currentFingerprint) || !this.jwtTokenProvider.isTokenTypeValid(token, "access")) {
+        if (!this.jwtTokenProvider.isValidToken(token, request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Invalid or expired token"));
         }

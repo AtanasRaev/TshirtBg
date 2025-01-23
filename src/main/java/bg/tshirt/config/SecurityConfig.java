@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .cors(cors -> {})
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/user/login", "/user/register", "/refresh-token").permitAll()
-                        .requestMatchers("/user/profile").authenticated()
+                        .requestMatchers("/user/profile", "/cloth/add").authenticated()
                         .anyRequest().authenticated();
                 })
                 .sessionManagement(session ->

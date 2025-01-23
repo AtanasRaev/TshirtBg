@@ -14,18 +14,58 @@ public class Cloth {
     @Column(nullable = false)
     private String name;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
     private double price;
 
-    @Column(unique = true)
+    @Column(nullable = false)
+    private String model;
+
+    @Column
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    @Column(unique = true)
+    @Column
     @Enumerated(EnumType.STRING)
     private Gender gender;
+
+    @Column(nullable = false)
+    private String image;
+
+    public Cloth(String name, String description, double price, String model, Type type, Gender gender) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.model = model;
+        this.type = type;
+        this.gender = gender;
+    }
+
+    public Cloth() {
+    }
+
+    public String getPageModel(){
+        String type = "";
+
+        switch (getType()) {
+            case SHORTS -> type = "K";
+            case SWEATSHIRT -> type = "SW";
+            case LONG_T_SHIRT -> type = "D";
+            case KIT -> type = "KT";
+        }
+
+        String gender = "";
+
+        switch (getGender()) {
+            case MALE -> gender = "M";
+            case FEMALE -> gender = "F";
+            case CHILD -> gender = "C";
+        }
+
+        return String.format("%s%s_%s", getModel(), type, gender);
+    }
 
     public long getId() {
         return id;
@@ -59,6 +99,14 @@ public class Cloth {
         this.price = price;
     }
 
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
     public Type getType() {
         return type;
     }
@@ -73,5 +121,13 @@ public class Cloth {
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

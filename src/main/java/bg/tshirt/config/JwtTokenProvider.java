@@ -20,6 +20,7 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -93,6 +94,10 @@ public class JwtTokenProvider {
         return parseToken(token).getSubject();
     }
 
+    public List<?> getRolesFromJwt(String token) {
+        return parseToken(token).get("roles", List.class);
+    }
+
     public String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
 
@@ -133,14 +138,6 @@ public class JwtTokenProvider {
         }
     }
 
-    private Claims parseToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
     public String generateDeviceFingerprint(HttpServletRequest request) {
         String userAgent = Optional.ofNullable(request.getHeader("User-Agent")).orElse("Unknown UserAgent");
         String screenResolution = Optional.ofNullable(request.getHeader("screenResolution")).orElse("Unknown Resolution");
@@ -152,6 +149,24 @@ public class JwtTokenProvider {
 
         String fingerprint = userAgent + screenResolution + timezone + language + plugins + hardwareConcurrency + deviceMemory;
         return hashFunction(fingerprint);
+    }
+
+    public boolean isValidToken(String token, HttpServletRequest request) {
+        if (token == null) {
+            return false;
+        }
+
+        String currentFingerprint = generateDeviceFingerprint(request);
+        return this.validateToken(token, currentFingerprint) &&
+                this.isTokenTypeValid(token, "access");
+    }
+
+    private Claims parseToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     private String hashFunction(String input) {
