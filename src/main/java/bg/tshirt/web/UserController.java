@@ -37,20 +37,7 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(HttpServletRequest request) {
-        String token = this.jwtTokenProvider.getJwtFromRequest(request);
-
-        if (!this.jwtTokenProvider.isValidToken(token, request)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Invalid or expired token"));
-        }
-
-        String userEmail = this.jwtTokenProvider.getEmailFromJwt(token);
-        UserDTO user = this.userService.findByEmail(userEmail);
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "User not found"));
-        }
+        UserDTO user = this.userService.validateUser(request);
 
         Map<String, Object> profile = Map.of(
                 "email", user.getEmail(),

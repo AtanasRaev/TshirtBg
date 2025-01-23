@@ -16,16 +16,14 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
         List<String> errors = new LinkedList<>();
-
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.add(error.getDefaultMessage());
         }
-
         ApiError apiError = new ApiError("error", errors);
-
         return ResponseEntity.badRequest().body(apiError);
     }
 
@@ -45,5 +43,23 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleEnumParsingErrors(HttpMessageNotReadableException ex) {
         return ResponseEntity.badRequest().body(
                 Map.of("message", "Invalid value provided for enum field. Check your inputs."));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<?> handleUnauthorizedException(UnauthorizedException ex) {
+        ApiError apiError = new ApiError("error", List.of(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<?> handleForbiddenException(ForbiddenException ex) {
+        ApiError apiError = new ApiError("error", List.of(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiError);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<?> handleNotFoundException(NotFoundException ex) {
+        ApiError apiError = new ApiError("error", List.of(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
 }
