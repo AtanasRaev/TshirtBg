@@ -1,17 +1,14 @@
 package bg.tshirt.web;
 
-import bg.tshirt.database.dto.ClothAddDTO;
-import bg.tshirt.database.dto.UserDTO;
+import bg.tshirt.database.dto.*;
+import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothService;
 import bg.tshirt.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -36,9 +33,42 @@ public class ClothController {
         }
 
         return ResponseEntity.ok(Map.of(
+                "status", "success",
                 "message", "Cloth added successfully!",
-                "clothName", clothDTO.getName(),
-                "addedBy", admin.getEmail()
+                "cloth_name", clothDTO.getName(),
+                "added_by", admin.getEmail()
+        ));
+    }
+
+    @GetMapping("/details/{id}")
+    public ResponseEntity<?> getClothById(@PathVariable("id") Long id) {
+        ClothPageDTO dto = this.clothService.findById(id);
+
+        if (dto == null) {
+            throw new NotFoundException("Cloth not found in the system.");
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                dto.getType(), dto
+        ));
+    }
+
+    //TODO: Test 
+    @PutMapping("edit/{id}")
+    public ResponseEntity<?> editClothById(@PathVariable("id") Long id, @ModelAttribute @Valid ClothEditDTO clothDto, HttpServletRequest request) {
+        UserDTO admin = this.userService.validateAdmin(request);
+
+        if (!this.clothService.editCloth(clothDto, id)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", String.format("Cloth with id: %d has no images", id)));
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "message", "Cloth edited successfully!",
+                "cloth_name", clothDto.getName(),
+                "edited_by", admin.getEmail()
         ));
     }
 }

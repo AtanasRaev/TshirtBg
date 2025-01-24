@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ClothRepository extends JpaRepository<Cloth, Integer> {
+public interface ClothRepository extends JpaRepository<Cloth, Long> {
     Optional<Cloth> findByModelAndTypeAndGender(String model, Type type, Gender gender);
 }

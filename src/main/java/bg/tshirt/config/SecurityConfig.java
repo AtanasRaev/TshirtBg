@@ -33,11 +33,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> {})
+                .cors(cors -> {
+                })
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/user/login", "/user/register", "/refresh-token").permitAll()
-                        .requestMatchers("/user/profile", "/cloth/add").authenticated()
-                        .anyRequest().authenticated();
+                    auth.requestMatchers("/user/login", "/user/register", "cloth/details/**").permitAll()
+                            .requestMatchers("/user/profile", "/cloth/add", "/refresh-token", "/cloth/edit/**").authenticated()
+                            .anyRequest().authenticated();
                 })
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

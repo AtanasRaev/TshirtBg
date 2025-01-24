@@ -1,77 +1,45 @@
-package bg.tshirt.database.entity;
+package bg.tshirt.database.dto;
 
+import bg.tshirt.database.entity.Image;
 import bg.tshirt.database.entity.enums.Gender;
 import bg.tshirt.database.entity.enums.Type;
-import jakarta.persistence.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "clothes")
-public class Cloth {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ClothPageDTO {
     private long id;
 
-    @Column(nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
     private double price;
 
-    @Column(nullable = false)
     private String model;
 
-    @Column
-    @Enumerated(EnumType.STRING)
     private Type type;
 
-    @Column
-    @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @OneToMany(mappedBy = "cloth",
-            fetch = FetchType.EAGER,
-            cascade = {CascadeType.REMOVE},
-            orphanRemoval = true)
-    private List<Image> images;
+    private List<ImagePageDTO> images;
 
-    public Cloth(String name, String description, double price, String model, Type type, Gender gender) {
+    public ClothPageDTO(long id,
+                        String name,
+                        String description,
+                        double price,
+                        String model,
+                        Type type,
+                        Gender gender) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.model = model;
         this.type = type;
         this.gender = gender;
-        this.images = new ArrayList<>();
     }
 
-    public Cloth() {
-    }
-
-    public String getPageModel(){
-        String type = "";
-
-        switch (getType()) {
-            case SHORTS -> type = "K";
-            case SWEATSHIRT -> type = "SW";
-            case LONG_T_SHIRT -> type = "D";
-            case KIT -> type = "KT";
-        }
-
-        String gender = "";
-
-        switch (getGender()) {
-            case MALE -> gender = "M";
-            case FEMALE -> gender = "F";
-            case CHILD -> gender = "C";
-        }
-
-        return String.format("%s%s_%s", getModel(), type, gender);
+    public ClothPageDTO() {
     }
 
     public long getId() {
@@ -130,11 +98,11 @@ public class Cloth {
         this.gender = gender;
     }
 
-    public List<Image> getImages() {
+    public List<ImagePageDTO> getImages() {
         return images;
     }
 
-    public void setImages(List<Image> images) {
+    public void setImages(List<ImagePageDTO> images) {
         this.images = images;
     }
 }
