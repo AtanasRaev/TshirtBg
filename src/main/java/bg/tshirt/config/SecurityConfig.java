@@ -43,13 +43,14 @@ public class SecurityConfig {
                                     "/cloth/search",
                                     "/cloth/category",
                                     "/cloth/type",
-                                    "order/create"
+                                    "/order/create"
                             ).permitAll()
                             .requestMatchers(
                                     "/user/profile",
                                     "/cloth/add",
                                     "/refresh-token",
-                                    "/cloth/edit/**"
+                                    "/cloth/edit/**",
+                                    "/order/list"
                             ).authenticated()
                             .anyRequest().authenticated();
                 })

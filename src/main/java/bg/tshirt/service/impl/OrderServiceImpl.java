@@ -2,6 +2,7 @@ package bg.tshirt.service.impl;
 
 import bg.tshirt.database.dto.OrderDTO;
 import bg.tshirt.database.dto.OrderItemDTO;
+import bg.tshirt.database.dto.OrderPageDTO;
 import bg.tshirt.database.dto.UserDTO;
 import bg.tshirt.database.entity.Cloth;
 import bg.tshirt.database.entity.Order;
@@ -14,6 +15,9 @@ import bg.tshirt.exceptions.BadRequestException;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.OrderService;
 import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,14 +30,17 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ClothRepository clothRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     public OrderServiceImpl(OrderRepository orderRepository,
                             ClothRepository clothRepository,
-                            UserRepository userRepository) {
+                            UserRepository userRepository,
+                            ModelMapper modelMapper) {
         this.orderRepository = orderRepository;
         this.clothRepository = clothRepository;
         this.userRepository = userRepository;
 
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -74,6 +81,12 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalPrice(totalPrice);
 
         this.orderRepository.save(order);
+    }
+
+    @Override
+    public Page<OrderPageDTO> getAllOrdersByStatus(Pageable pageable, String status) {
+        return this.orderRepository.findAllByStatus(pageable, status)
+                .map(order -> this.modelMapper.map(order, OrderPageDTO.class));
     }
 
     private User validateUser(UserDTO userDTO) {

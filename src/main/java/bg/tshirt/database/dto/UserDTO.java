@@ -2,6 +2,7 @@ package bg.tshirt.database.dto;
 
 public class UserDTO {
     private String email;
+
     private String address;
 
     public UserDTO() {

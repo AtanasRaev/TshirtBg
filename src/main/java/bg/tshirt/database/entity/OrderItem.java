@@ -9,17 +9,17 @@ public class OrderItem {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cloth_id", referencedColumnName = "id")
     private Cloth cloth;
 
     @Column
-    private Integer quantity;
+    private int quantity;
 
     @Column
-    private Double price;
+    private double price;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     private Order order;
 
@@ -31,19 +31,19 @@ public class OrderItem {
         this.id = id;
     }
 
-    public Integer getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
-    public Double getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

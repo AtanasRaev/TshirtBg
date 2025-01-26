@@ -3,6 +3,7 @@ package bg.tshirt.database.dto;
 import bg.tshirt.database.entity.enums.Category;
 import bg.tshirt.database.entity.enums.Gender;
 import bg.tshirt.database.entity.enums.Type;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -31,8 +32,10 @@ public class ClothDTO {
     @NotBlank(message = "Model cannot be blank.")
     private String model;
 
+    @JsonProperty("front_image")
     private MultipartFile frontImage;
 
+    @JsonProperty("back_image")
     private MultipartFile backImage;
 
     public String getName() {

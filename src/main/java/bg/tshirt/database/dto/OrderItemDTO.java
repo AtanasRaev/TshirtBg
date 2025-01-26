@@ -1,7 +1,9 @@
 package bg.tshirt.database.dto;
 
-public class OrderItemDTO {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+public class OrderItemDTO {
+    @JsonProperty("cloth_id")
     private Long clothId;
 
     private int quantity;
