@@ -1,6 +1,6 @@
 package bg.tshirt.service.impl;
 
-import bg.tshirt.database.dto.ClothAddDTO;
+import bg.tshirt.database.dto.ClothDTO;
 import bg.tshirt.database.entity.Cloth;
 import bg.tshirt.database.entity.Image;
 import bg.tshirt.database.repository.ImageRepository;
@@ -64,7 +64,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public List<Image> saveImagesInCloud(ClothAddDTO clothDTO, Cloth cloth) {
+    public List<Image> saveImagesInCloud(ClothDTO clothDTO, Cloth cloth) {
         Image front = saveImageInCloud(clothDTO.getFrontImage(), cloth, "F");
         Image back = saveImageInCloud(clothDTO.getBackImage(), cloth, "B");
 

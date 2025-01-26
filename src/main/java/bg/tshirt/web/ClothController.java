@@ -24,7 +24,7 @@ public class ClothController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addCloth(@ModelAttribute @Valid ClothAddDTO clothDTO, HttpServletRequest request) {
+    public ResponseEntity<?> addCloth(@ModelAttribute @Valid ClothDTO clothDTO, HttpServletRequest request) {
         UserDTO admin = this.userService.validateAdmin(request);
 
         if (!this.clothService.addCloth(clothDTO)) {

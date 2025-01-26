@@ -1,6 +1,5 @@
 package bg.tshirt.service.impl;
 
-import bg.tshirt.database.dto.ClothAddDTO;
 import bg.tshirt.database.dto.ClothDTO;
 import bg.tshirt.database.dto.ClothEditDTO;
 import bg.tshirt.database.dto.ClothPageDTO;
@@ -33,7 +32,7 @@ public class ClothServiceImpl implements ClothService {
     }
 
     @Override
-    public boolean addCloth(ClothAddDTO clothDTO) {
+    public boolean addCloth(ClothDTO clothDTO) {
         Optional<Cloth> optional = this.clothRepository.findByModelAndTypeAndGender(clothDTO.getModel(), clothDTO.getType(), clothDTO.getGender());
 
         if (optional.isPresent()) {

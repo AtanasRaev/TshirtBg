@@ -1,6 +1,6 @@
 package bg.tshirt.service;
 
-import bg.tshirt.database.dto.ClothAddDTO;
+import bg.tshirt.database.dto.ClothDTO;
 import bg.tshirt.database.entity.Cloth;
 import bg.tshirt.database.entity.Image;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +18,7 @@ public interface ImageService {
 
     Image findByPublicIds(String publicId);
 
-    List<Image> saveImagesInCloud(ClothAddDTO clothDTO, Cloth cloth);
+    List<Image> saveImagesInCloud(ClothDTO clothDTO, Cloth cloth);
 
     Image findByPath(String path);
 
