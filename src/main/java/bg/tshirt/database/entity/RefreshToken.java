@@ -2,6 +2,7 @@ package bg.tshirt.database.entity;
 
 import jakarta.persistence.*;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Entity
@@ -13,7 +14,7 @@ public class RefreshToken {
 
     private String tokenId;
     private String userEmail;
-    private Date expiryDate;
+    private Instant expiryDate;
     private boolean revoked;
     private String deviceId;
 
@@ -41,11 +42,11 @@ public class RefreshToken {
         this.userEmail = userEmail;
     }
 
-    public Date getExpiryDate() {
+    public Instant getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(Instant expiryDate) {
         this.expiryDate = expiryDate;
     }
 

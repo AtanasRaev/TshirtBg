@@ -6,7 +6,7 @@ import bg.tshirt.service.RefreshTokenService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Service
 public class RefreshTokenServiceImpl implements RefreshTokenService {
@@ -17,7 +17,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
-    public RefreshToken saveNewToken(String tokenId, String userEmail, Date expiryDate) {
+    public RefreshToken saveNewToken(String tokenId, String userEmail, Instant expiryDate) {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setTokenId(tokenId);
         refreshToken.setUserEmail(userEmail);
@@ -29,7 +29,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public boolean isValid(String tokenId) {
         return refreshTokenRepository.findByTokenId(tokenId)
-                .filter(token -> !token.isRevoked() && token.getExpiryDate().after(new Date()))
+                .filter(token -> !token.isRevoked() && token.getExpiryDate().isAfter(Instant.now()))
                 .isPresent();
     }
 
@@ -43,7 +43,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Scheduled(cron = "0 * * * *")
     private void cleanupExpiredTokens() {
-        refreshTokenRepository.deleteByExpiryDateBefore(new Date());
+        refreshTokenRepository.deleteByExpiryDateBefore(Instant.now());
     }
 }
-

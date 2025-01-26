@@ -62,4 +62,10 @@ public class GlobalExceptionHandler {
         ApiError apiError = new ApiError("error", List.of(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<?> handleBadRequestException(BadRequestException ex) {
+        ApiError apiError = new ApiError("error", List.of(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+    }
 }

@@ -1,6 +1,8 @@
 package bg.tshirt.database.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.time.Instant;
 import java.util.Date;
 
 public class TokenRefreshResponse {
@@ -11,15 +13,15 @@ public class TokenRefreshResponse {
     private String refreshToken;
 
     @JsonProperty("access_token_expiry")
-    private Date accessTokenExpiry;
+    private Instant accessTokenExpiry;
 
     @JsonProperty("refresh_token_expiry")
-    private Date refreshTokenExpiry;
+    private Instant refreshTokenExpiry;
 
     public TokenRefreshResponse(String accessToken,
                                 String refreshToken,
-                                Date accessTokenExpiry,
-                                Date refreshTokenExpiry) {
+                                Instant accessTokenExpiry,
+                                Instant refreshTokenExpiry) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.accessTokenExpiry = accessTokenExpiry;
@@ -42,19 +44,19 @@ public class TokenRefreshResponse {
         this.refreshToken = refreshToken;
     }
 
-    public Date getAccessTokenExpiry() {
+    public Instant getAccessTokenExpiry() {
         return accessTokenExpiry;
     }
 
-    public void setAccessTokenExpiry(Date accessTokenExpiry) {
+    public void setAccessTokenExpiry(Instant accessTokenExpiry) {
         this.accessTokenExpiry = accessTokenExpiry;
     }
 
-    public Date getRefreshTokenExpiry() {
+    public Instant getRefreshTokenExpiry() {
         return refreshTokenExpiry;
     }
 
-    public void setRefreshTokenExpiry(Date refreshTokenExpiry) {
+    public void setRefreshTokenExpiry(Instant refreshTokenExpiry) {
         this.refreshTokenExpiry = refreshTokenExpiry;
     }
 }

@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
                 roles
         );
 
-        userRepository.save(user);
+        saveUser(user);
     }
 
     @Override
@@ -72,6 +72,11 @@ public class UserServiceImpl implements UserService {
     public UserDTO validateUser(HttpServletRequest request) {
         String token = extractToken(request);
         return findUser(token);
+    }
+
+    @Override
+    public void saveUser(User user) {
+        this.userRepository.save(user);
     }
 
     private void validateAdminRole(String token) {

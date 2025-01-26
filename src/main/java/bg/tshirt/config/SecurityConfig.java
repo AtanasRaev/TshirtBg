@@ -42,7 +42,8 @@ public class SecurityConfig {
                                     "/cloth/details/**",
                                     "/cloth/search",
                                     "/cloth/category",
-                                    "/cloth/type"
+                                    "/cloth/type",
+                                    "order/create"
                             ).permitAll()
                             .requestMatchers(
                                     "/user/profile",

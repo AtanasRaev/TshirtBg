@@ -19,6 +19,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -48,14 +49,14 @@ public class JwtTokenProvider {
 
     public String generateAccessToken(Authentication authentication, String deviceFingerprint) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+        Instant now = Instant.now();
+        Instant expiryDate = now.plusMillis(jwtExpirationInMs);
 
         return Jwts.builder()
                 .setSubject(customUserDetails.getUsername())
                 .setId(UUID.randomUUID().toString())
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expiryDate))
                 .claim("type", "access")
                 .claim("roles", customUserDetails.getAuthorities()
                         .stream()
@@ -67,23 +68,43 @@ public class JwtTokenProvider {
     }
 
     public String generateRefreshToken(String email, String deviceFingerprint) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtRefreshExpirationInMs);
+        Instant now = Instant.now();
+        Instant expiryDate = now.plusMillis(jwtRefreshExpirationInMs);
 
         return Jwts.builder()
                 .setSubject(email)
                 .setId(UUID.randomUUID().toString())
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expiryDate))
                 .claim("type", "refresh")
                 .claim("fingerprint", deviceFingerprint)
                 .signWith(key)
                 .compact();
     }
 
-    public Date getExpirationDate(String token) {
+
+    public Instant getExpirationDate(String token) {
         Claims claims = parseToken(token);
-        return claims.getExpiration();
+        return claims.getExpiration().toInstant();
+    }
+
+    public boolean validateToken(String token, String currentFingerprint) {
+        try {
+            Claims claims = parseToken(token);
+            String tokenHashedFingerprint = claims.get("fingerprint", String.class);
+            return currentFingerprint.equals(tokenHashedFingerprint);
+        } catch (ExpiredJwtException ex) {
+            logger.error("Expired JWT token: {}", ex.getMessage());
+        } catch (UnsupportedJwtException ex) {
+            logger.error("Unsupported JWT token: {}", ex.getMessage());
+        } catch (MalformedJwtException ex) {
+            logger.error("Malformed JWT token: {}", ex.getMessage());
+        } catch (SecurityException ex) {
+            logger.error("Invalid JWT signature: {}", ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            logger.error("JWT claims string is empty: {}", ex.getMessage());
+        }
+        return false;
     }
 
     public String getJtiFromJwt(String token) {
@@ -105,26 +126,6 @@ public class JwtTokenProvider {
             return bearerToken.substring(7);
         }
         return null;
-    }
-
-    public boolean validateToken(String token, String currentFingerprint) {
-        try {
-            Claims claims = parseToken(token);
-
-            String tokenHashedFingerprint = claims.get("fingerprint", String.class);
-            return currentFingerprint.equals(tokenHashedFingerprint);
-        } catch (ExpiredJwtException ex) {
-            logger.error("Expired JWT token: {}", ex.getMessage());
-        } catch (UnsupportedJwtException ex) {
-            logger.error("Unsupported JWT token: {}", ex.getMessage());
-        } catch (MalformedJwtException ex) {
-            logger.error("Malformed JWT token: {}", ex.getMessage());
-        } catch (SecurityException ex) {
-            logger.error("Invalid JWT signature: {}", ex.getMessage());
-        } catch (IllegalArgumentException ex) {
-            logger.error("JWT claims string is empty: {}", ex.getMessage());
-        }
-        return false;
     }
 
     public boolean isTokenTypeValid(String token, String expectedType) {

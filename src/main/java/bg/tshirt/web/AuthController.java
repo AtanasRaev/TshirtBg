@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -97,9 +97,9 @@ public class AuthController {
     }
 
     private boolean isRefreshTokenAboutToExpire(String refreshToken) {
-        Date expiryDate = jwtTokenProvider.getExpirationDate(refreshToken);
-        long gracePeriod = 5 * 60 * 1000;
-        return expiryDate.before(new Date(System.currentTimeMillis() + gracePeriod));
+        Instant expiryDate = jwtTokenProvider.getExpirationDate(refreshToken);
+        Duration gracePeriod = Duration.ofMinutes(5);
+        return expiryDate.isBefore(Instant.now().plus(gracePeriod));
     }
 
     private TokenRefreshResponse generateNewTokens(String email, HttpServletRequest httpRequest) {
@@ -112,8 +112,8 @@ public class AuthController {
         String newAccessToken = jwtTokenProvider.generateAccessToken(authentication, currentFingerprint);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(email, currentFingerprint);
 
-        Date accessTokenExpiry = jwtTokenProvider.getExpirationDate(newAccessToken);
-        Date refreshTokenExpiry = jwtTokenProvider.getExpirationDate(newRefreshToken);
+        Instant accessTokenExpiry = jwtTokenProvider.getExpirationDate(newAccessToken);
+        Instant refreshTokenExpiry = jwtTokenProvider.getExpirationDate(newRefreshToken);
 
         return new TokenRefreshResponse(newAccessToken, newRefreshToken, accessTokenExpiry, refreshTokenExpiry);
     }
