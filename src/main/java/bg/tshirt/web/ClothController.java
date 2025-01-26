@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -42,7 +43,13 @@ public class ClothController {
 
     @GetMapping("/details/{id}")
     public ResponseEntity<?> getClothById(@PathVariable("id") Long id) {
-        ClothPageDTO dto = this.clothService.findById(id);
+        if (id == null || id < 1) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", "Id must be a positive number"
+            ));
+        }
+        ClothDetailsPageDTO dto = this.clothService.findById(id);
 
         if (dto == null) {
             throw new NotFoundException("Cloth not found in the system.");
@@ -54,9 +61,15 @@ public class ClothController {
         ));
     }
 
-    @PutMapping("edit/{id}")
+    @PutMapping("/edit/{id}")
     public ResponseEntity<?> editClothById(@PathVariable("id") Long id, @ModelAttribute @Valid ClothEditDTO clothDto, HttpServletRequest request) {
         //TODO: Think about changing the model of a cloth for the public id
+        if (id == null || id < 1) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", "Id must be a positive number"
+            ));
+        }
         UserDTO admin = this.userService.validateAdmin(request);
 
         if (!this.clothService.editCloth(clothDto, id)) {
@@ -69,6 +82,40 @@ public class ClothController {
                 "message", "Cloth edited successfully!",
                 "cloth_name", clothDto.getName(),
                 "edited_by", admin.getEmail()
+        ));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchCloth(@RequestParam("name") String name) {
+        if (name == null || name.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", "Search query cannot be empty"
+            ));
+        }
+
+        List<ClothPageDTO> dto = this.clothService.findByQuery(name);
+
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "cloths", dto
+        ));
+    }
+
+    @GetMapping("/category")
+    public ResponseEntity<?> searchByCategory(@RequestParam("name") String name) {
+        if (name == null || name.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", "Search query cannot be empty"
+            ));
+        }
+
+        List<ClothPageDTO> dto = this.clothService.findByCategory(name);
+
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "cloths", dto
         ));
     }
 }

@@ -1,5 +1,6 @@
 package bg.tshirt.database.entity;
 
+import bg.tshirt.database.entity.enums.Category;
 import bg.tshirt.database.entity.enums.Gender;
 import bg.tshirt.database.entity.enums.Type;
 import jakarta.persistence.*;
@@ -34,13 +35,17 @@ public class Cloth {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private Category category;
+
     @OneToMany(mappedBy = "cloth",
             fetch = FetchType.EAGER,
             cascade = {CascadeType.REMOVE},
             orphanRemoval = true)
     private List<Image> images;
 
-    public Cloth(String name, String description, double price, String model, Type type, Gender gender) {
+    public Cloth(String name, String description, double price, String model, Type type, Gender gender, Category category) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -48,6 +53,7 @@ public class Cloth {
         this.type = type;
         this.gender = gender;
         this.images = new ArrayList<>();
+        this.category = category;
     }
 
     public Cloth() {
@@ -136,5 +142,13 @@ public class Cloth {
 
     public void setImages(List<Image> images) {
         this.images = images;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

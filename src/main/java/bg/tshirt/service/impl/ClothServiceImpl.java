@@ -2,6 +2,7 @@ package bg.tshirt.service.impl;
 
 import bg.tshirt.database.dto.ClothDTO;
 import bg.tshirt.database.dto.ClothEditDTO;
+import bg.tshirt.database.dto.ClothDetailsPageDTO;
 import bg.tshirt.database.dto.ClothPageDTO;
 import bg.tshirt.database.entity.Cloth;
 import bg.tshirt.database.entity.Image;
@@ -44,7 +45,8 @@ public class ClothServiceImpl implements ClothService {
                 clothDTO.getPrice(),
                 clothDTO.getModel(),
                 clothDTO.getType(),
-                clothDTO.getGender());
+                clothDTO.getGender(),
+                clothDTO.getCategory());
 
 
         List<Image> images = new ArrayList<>();
@@ -57,7 +59,7 @@ public class ClothServiceImpl implements ClothService {
     }
 
     @Override
-    public ClothPageDTO findById(Long id) {
+    public ClothDetailsPageDTO findById(Long id) {
         Optional<Cloth> optional = this.clothRepository.findById(id);
 
         if (optional.isEmpty()) {
@@ -66,7 +68,7 @@ public class ClothServiceImpl implements ClothService {
 
         Cloth cloth = optional.get();
 
-        return this.modelMapper.map(cloth, ClothPageDTO.class);
+        return this.modelMapper.map(cloth, ClothDetailsPageDTO.class);
     }
 
     @Override
@@ -89,6 +91,22 @@ public class ClothServiceImpl implements ClothService {
         return !updatedImages.isEmpty();
     }
 
+    @Override
+    public List<ClothPageDTO> findByQuery(String query) {
+        return this.clothRepository.findByQuery("%" + query + "%")
+                .stream()
+                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class))
+                .toList();
+    }
+
+    @Override
+    public List<ClothPageDTO> findByCategory(String query) {
+        return this.clothRepository.findByCategory(query)
+                .stream()
+                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class))
+                .toList();
+    }
+
     private boolean isInvalidUpdate(ClothEditDTO clothDto, Cloth cloth) {
         boolean frontAndBackImagesEmpty = clothDto.getFrontImage() != null && clothDto.getFrontImage().isEmpty()
                 && clothDto.getBackImage() != null && clothDto.getBackImage().isEmpty();
@@ -104,6 +122,7 @@ public class ClothServiceImpl implements ClothService {
         cloth.setModel(clothDto.getModel());
         cloth.setType(clothDto.getType());
         cloth.setGender(clothDto.getGender());
+        cloth.setCategory(clothDto.getCategory());
     }
 
     private List<Image> processImages(ClothEditDTO clothDto, Cloth cloth) {

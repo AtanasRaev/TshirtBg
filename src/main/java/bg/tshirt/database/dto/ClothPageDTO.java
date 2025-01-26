@@ -1,52 +1,27 @@
 package bg.tshirt.database.dto;
 
-import bg.tshirt.database.entity.Image;
-import bg.tshirt.database.entity.enums.Gender;
 import bg.tshirt.database.entity.enums.Type;
 
 import java.util.List;
 
 public class ClothPageDTO {
-    private long id;
+   private Long id;
 
-    private String name;
+   private String name;
 
-    private String description;
+   private Double price;
 
-    private double price;
+   private String model;
 
-    private String model;
+   private Type type;
 
-    private Type type;
+   private List<ImagePageDTO> images;
 
-    private Gender gender;
-
-    private List<ImagePageDTO> images;
-
-    public ClothPageDTO(long id,
-                        String name,
-                        String description,
-                        double price,
-                        String model,
-                        Type type,
-                        Gender gender) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.model = model;
-        this.type = type;
-        this.gender = gender;
-    }
-
-    public ClothPageDTO() {
-    }
-
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -58,19 +33,11 @@ public class ClothPageDTO {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -88,14 +55,6 @@ public class ClothPageDTO {
 
     public void setType(Type type) {
         this.type = type;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
     }
 
     public List<ImagePageDTO> getImages() {
