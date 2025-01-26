@@ -1,6 +1,7 @@
 package bg.tshirt.service.impl;
 
 import bg.tshirt.database.dto.ClothAddDTO;
+import bg.tshirt.database.dto.ClothDTO;
 import bg.tshirt.database.dto.ClothEditDTO;
 import bg.tshirt.database.dto.ClothPageDTO;
 import bg.tshirt.database.entity.Cloth;
@@ -11,12 +12,10 @@ import bg.tshirt.service.ClothService;
 import bg.tshirt.service.ImageService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.IntStream;
 
 
 @Service
@@ -49,8 +48,8 @@ public class ClothServiceImpl implements ClothService {
                 clothDTO.getGender());
 
 
-        List<Image> images = this.imageService.saveImagesInCloud(clothDTO, cloth);
-
+        List<Image> images = new ArrayList<>();
+        addNewImages(clothDTO, cloth, images);
         cloth.setImages(images);
 
         this.clothRepository.save(cloth);
@@ -73,75 +72,85 @@ public class ClothServiceImpl implements ClothService {
 
     @Override
     public boolean editCloth(ClothEditDTO clothDto, Long id) {
-        Optional<Cloth> optional = this.clothRepository.findById(id);
+        Cloth cloth = this.clothRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Cloth with id: %d is not found", id)));
 
-        if (optional.isEmpty()) {
-            throw new NotFoundException(String.format("Cloth with id: %d is not found", id));
+        if (isInvalidUpdate(clothDto, cloth)) {
+            return false;
         }
 
-        Cloth cloth = optional.get();
+        updateClothDetails(cloth, clothDto);
+
+        List<Image> updatedImages = processImages(clothDto, cloth);
+
+        cloth.setImages(updatedImages);
+        this.clothRepository.save(cloth);
+        this.imageService.saveAll(updatedImages);
+
+        return !updatedImages.isEmpty();
+    }
+
+    private boolean isInvalidUpdate(ClothEditDTO clothDto, Cloth cloth) {
+        boolean frontAndBackImagesEmpty = clothDto.getFrontImage() != null && clothDto.getFrontImage().isEmpty()
+                && clothDto.getBackImage() != null && clothDto.getBackImage().isEmpty();
+        boolean removingAllImages = clothDto.getRemovedImages().size() >= cloth.getImages().size();
+
+        return frontAndBackImagesEmpty && removingAllImages;
+    }
+
+    private void updateClothDetails(Cloth cloth, ClothEditDTO clothDto) {
         cloth.setName(clothDto.getName());
         cloth.setDescription(clothDto.getDescription());
         cloth.setPrice(clothDto.getPrice());
         cloth.setModel(clothDto.getModel());
         cloth.setType(clothDto.getType());
         cloth.setGender(clothDto.getGender());
+    }
 
+    private List<Image> processImages(ClothEditDTO clothDto, Cloth cloth) {
         List<String> removedImagesPaths = clothDto.getRemovedImages();
-
-        if (clothDto.getFrontImage() == null && clothDto.getBackImage() == null) {
-            return false;
-        }
-
-        if (((clothDto.getFrontImage() != null && clothDto.getFrontImage().isEmpty()) && (clothDto.getBackImage() != null && clothDto.getBackImage().isEmpty())) &&
-                (removedImagesPaths.size() >= cloth.getImages().size())) {
-            return false;
-        }
-
         List<Image> imagesToSave = new ArrayList<>();
 
-        List<String> clothImages = new ArrayList<>(cloth.getImages()
-                .stream()
-                .map(Image::getPath)
-                .toList());
-
         if (!removedImagesPaths.isEmpty()) {
-            removedImagesPaths.forEach(path -> {
-                Image byPath = this.imageService.findByPath(path);
-
-                if (byPath != null) {
-                    this.imageService.deleteImage(byPath);
-                }
-            });
+            removeImages(removedImagesPaths);
         }
 
-        clothImages.removeIf(removedImagesPaths::contains);
+        List<String> existingPaths = cloth.getImages()
+                .stream()
+                .map(Image::getPath)
+                .filter(path -> !removedImagesPaths.contains(path))
+                .toList();
 
-        clothImages.forEach(path -> {
-            Image byPath = this.imageService.findByPath(path);
-
-            if (byPath != null) {
-                imagesToSave.add(byPath);
+        existingPaths.forEach(path -> {
+            Image image = this.imageService.findByPath(path);
+            if (image != null) {
+                imagesToSave.add(image);
             }
         });
 
+        addNewImages(clothDto, cloth, imagesToSave);
+
+        return imagesToSave;
+    }
+
+    private void removeImages(List<String> removedImagesPaths) {
+        removedImagesPaths.forEach(path -> {
+            Image image = this.imageService.findByPath(path);
+            if (image != null) {
+                this.imageService.deleteImage(image);
+            }
+        });
+    }
+
+    private void addNewImages(ClothDTO clothDto, Cloth cloth, List<Image> imagesToSave) {
         if (clothDto.getFrontImage() != null && !clothDto.getFrontImage().isEmpty()) {
-            Image front = this.imageService.saveImageInCloud(clothDto.getFrontImage(), cloth, "F");
-            imagesToSave.add(front);
+            Image frontImage = this.imageService.saveImageInCloud(clothDto.getFrontImage(), cloth, "F");
+            imagesToSave.add(frontImage);
         }
 
         if (clothDto.getBackImage() != null && !clothDto.getBackImage().isEmpty()) {
-            Image back = this.imageService.saveImageInCloud(clothDto.getBackImage(), cloth, "B");
-            imagesToSave.add(back);
+            Image backImage = this.imageService.saveImageInCloud(clothDto.getBackImage(), cloth, "B");
+            imagesToSave.add(backImage);
         }
-
-        if (cloth.getImages().isEmpty()) {
-            return false;
-        }
-
-        cloth.setImages(imagesToSave);
-        this.clothRepository.save(cloth);
-        this.imageService.saveAll(imagesToSave);
-        return true;
     }
 }

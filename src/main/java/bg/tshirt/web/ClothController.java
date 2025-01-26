@@ -54,9 +54,9 @@ public class ClothController {
         ));
     }
 
-    //TODO: Test 
     @PutMapping("edit/{id}")
     public ResponseEntity<?> editClothById(@PathVariable("id") Long id, @ModelAttribute @Valid ClothEditDTO clothDto, HttpServletRequest request) {
+        //TODO: Think about changing the model of a cloth for the public id
         UserDTO admin = this.userService.validateAdmin(request);
 
         if (!this.clothService.editCloth(clothDto, id)) {

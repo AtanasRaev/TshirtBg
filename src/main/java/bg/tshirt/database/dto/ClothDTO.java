@@ -5,6 +5,7 @@ import bg.tshirt.database.entity.enums.Type;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import org.springframework.web.multipart.MultipartFile;
 
 public class ClothDTO {
     @NotBlank(message = "Name cannot be blank.")
@@ -25,6 +26,10 @@ public class ClothDTO {
 
     @NotBlank(message = "Model cannot be blank.")
     private String model;
+
+    private MultipartFile frontImage;
+
+    private MultipartFile backImage;
 
     public String getName() {
         return name;
@@ -66,11 +71,27 @@ public class ClothDTO {
         this.gender = gender;
     }
 
-    public @NotBlank(message = "Model cannot be blank.") String getModel() {
+    public String getModel() {
         return model;
     }
 
-    public void setModel(@NotBlank(message = "Model cannot be blank.") String model) {
+    public void setModel(String model) {
         this.model = model;
+    }
+
+    public MultipartFile getFrontImage() {
+        return frontImage;
+    }
+
+    public void setFrontImage(MultipartFile frontImage) {
+        this.frontImage = frontImage;
+    }
+
+    public MultipartFile getBackImage() {
+        return backImage;
+    }
+
+    public void setBackImage(MultipartFile backImage) {
+        this.backImage = backImage;
     }
 }
