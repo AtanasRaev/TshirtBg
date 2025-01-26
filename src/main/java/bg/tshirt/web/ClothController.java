@@ -6,6 +6,12 @@ import bg.tshirt.service.ClothService;
 import bg.tshirt.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -86,36 +92,98 @@ public class ClothController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchCloth(@RequestParam("name") String name) {
-        if (name == null || name.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "status", "error",
-                    "message", "Search query cannot be empty"
-            ));
+    public ResponseEntity<?> searchCloth(@RequestParam(name = "name") String name,
+                                         @RequestParam(name = "sort", defaultValue = "saleCount") String sort,
+                                         @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
+                                         @RequestParam(defaultValue = "1") @Min(1) int page) {
+        ResponseEntity<?> validationResponse = validateInputs(name, sort);
+
+        if (validationResponse != null) {
+            return validationResponse;
         }
 
-        List<ClothPageDTO> dto = this.clothService.findByQuery(name);
+        Pageable pageable = createPageable(page, size, sort);
+        Page<?> clothPage = this.clothService.findByQuery(pageable, name);
 
-        return ResponseEntity.ok(Map.of(
-                "status", "success",
-                "cloths", dto
-        ));
+        return buildPagedResponse(clothPage);
     }
 
     @GetMapping("/category")
-    public ResponseEntity<?> searchByCategory(@RequestParam("name") String name) {
+    public ResponseEntity<?> searchByCategory(@RequestParam(name = "name") String name,
+                                              @RequestParam(name = "sort", defaultValue = "saleCount") String sort,
+                                              @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
+                                              @RequestParam(defaultValue = "1") @Min(1) int page) {
+        ResponseEntity<?> validationResponse = validateInputs(name, sort);
+
+        if (validationResponse != null) {
+            return validationResponse;
+        }
+
+        Pageable pageable = createPageable(page, size, sort);
+        Page<?> clothPage = this.clothService.findByCategory(pageable, name);
+
+        return buildPagedResponse(clothPage);
+    }
+
+    @GetMapping("/type")
+    public ResponseEntity<?> searchByType(@RequestParam(name = "name") String name,
+                                          @RequestParam(name = "sort", defaultValue = "saleCount") String sort,
+                                          @RequestParam(name = "category", required = false) String category,
+                                          @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
+                                          @RequestParam(defaultValue = "1") @Min(1) int page) {
+        ResponseEntity<?> validationResponse = validateInputs(name, sort);
+
+        if (validationResponse != null) {
+            return validationResponse;
+        }
+
+        Pageable pageable = createPageable(page, size, sort);
+        Page<ClothPageDTO> clothPage = getClothsByTypeAndCategory(pageable, name, category);
+
+        return buildPagedResponse(clothPage);
+    }
+
+    private ResponseEntity<?> validateInputs(String name, String sort) {
         if (name == null || name.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of(
                     "status", "error",
-                    "message", "Search query cannot be empty"
+                    "message", "Query parameter 'name' cannot be empty"
             ));
         }
 
-        List<ClothPageDTO> dto = this.clothService.findByCategory(name);
+        if (!"saleCount".equals(sort) &&
+                !"priceDesc".equals(sort) &&
+                !"priceAsc".equals(sort)) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", "Sort must be 'saleCount', 'priceDesc', or 'priceAsc'"
+            ));
+        }
+        return null;
+    }
 
+    private Pageable createPageable(int page, int size, String sort) {
+        Sort.Direction direction = sort.equals("priceDesc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        String sortProperty = sort.equals("saleCount") ? "saleCount" : "price";
+        return PageRequest.of(page - 1, size, Sort.by(direction, sortProperty));
+    }
+
+    private ResponseEntity<?> buildPagedResponse(Page<?> clothPage) {
         return ResponseEntity.ok(Map.of(
                 "status", "success",
-                "cloths", dto
+                "items_on_page", clothPage.getNumberOfElements(),
+                "total_items", clothPage.getTotalElements(),
+                "total_pages", clothPage.getTotalPages(),
+                "current_page", clothPage.getNumber() + 1,
+                "cloths", clothPage.getContent()
         ));
+    }
+
+    private Page<ClothPageDTO> getClothsByTypeAndCategory(Pageable pageable, String type, String category) {
+        if (category != null && !category.isBlank()) {
+            return this.clothService.findByTypeAndCategory(pageable, type, category);
+        } else {
+            return this.clothService.findByType(pageable, type);
+        }
     }
 }

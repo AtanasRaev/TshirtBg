@@ -11,6 +11,8 @@ import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothService;
 import bg.tshirt.service.ImageService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -92,19 +94,27 @@ public class ClothServiceImpl implements ClothService {
     }
 
     @Override
-    public List<ClothPageDTO> findByQuery(String query) {
-        return this.clothRepository.findByQuery("%" + query + "%")
-                .stream()
-                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class))
-                .toList();
+    public Page<ClothPageDTO> findByQuery(Pageable pageable, String query) {
+        return this.clothRepository.findByQuery(pageable, "%" + query + "%")
+                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
     }
 
     @Override
-    public List<ClothPageDTO> findByCategory(String query) {
-        return this.clothRepository.findByCategory(query)
-                .stream()
-                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class))
-                .toList();
+    public Page<ClothPageDTO> findByCategory(Pageable pageable, String query) {
+        return this.clothRepository.findByCategory(pageable, query)
+                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
+    }
+
+    @Override
+    public Page<ClothPageDTO> findByType(Pageable pageable, String type) {
+        return this.clothRepository.findByType(pageable, type)
+                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
+    }
+
+    @Override
+    public Page<ClothPageDTO> findByTypeAndCategory(Pageable pageable, String type, String category) {
+        return this.clothRepository.findByTypeAndCategory(pageable, type, category)
+                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
     }
 
     private boolean isInvalidUpdate(ClothEditDTO clothDto, Cloth cloth) {

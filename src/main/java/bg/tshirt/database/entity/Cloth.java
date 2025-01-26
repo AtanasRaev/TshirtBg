@@ -39,6 +39,9 @@ public class Cloth {
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    @Column(nullable = false)
+    private int saleCount = 0;
+
     @OneToMany(mappedBy = "cloth",
             fetch = FetchType.EAGER,
             cascade = {CascadeType.REMOVE},
@@ -150,5 +153,13 @@ public class Cloth {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public int getSaleCount() {
+        return saleCount;
+    }
+
+    public void setSaleCount(int saleCount) {
+        this.saleCount = saleCount;
     }
 }
