@@ -62,15 +62,9 @@ public class ClothServiceImpl implements ClothService {
 
     @Override
     public ClothDetailsPageDTO findById(Long id) {
-        Optional<Cloth> optional = this.clothRepository.findById(id);
-
-        if (optional.isEmpty()) {
-            return null;
-        }
-
-        Cloth cloth = optional.get();
-
-        return this.modelMapper.map(cloth, ClothDetailsPageDTO.class);
+        return this.clothRepository.findById(id)
+                .map(cloth -> this.modelMapper.map(cloth, ClothDetailsPageDTO.class))
+                .orElse(null);
     }
 
     @Override

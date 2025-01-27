@@ -2,6 +2,7 @@ package bg.tshirt.service.impl;
 
 import bg.tshirt.config.JwtTokenProvider;
 import bg.tshirt.database.dto.UserDTO;
+import bg.tshirt.database.dto.UserProfileDTO;
 import bg.tshirt.database.dto.UserRegistrationDTO;
 import bg.tshirt.database.entity.User;
 import bg.tshirt.database.entity.enums.Role;
@@ -13,6 +14,7 @@ import bg.tshirt.exceptions.UnauthorizedException;
 import bg.tshirt.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,14 +27,17 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
     private final static int ADMINS_COUNT = 2;
 
     public UserServiceImpl(UserRepository userRepository,
                            JwtTokenProvider jwtTokenProvider,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -77,6 +82,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public void saveUser(User user) {
         this.userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public UserProfileDTO getUserProfile(HttpServletRequest request) {
+        UserDTO userDTO = validateUser(request);
+        return this.userRepository.findByEmail(userDTO.getEmail())
+                .map(user -> this.modelMapper.map(user, UserProfileDTO.class))
+                .orElse(null);
     }
 
     private void validateAdminRole(String token) {

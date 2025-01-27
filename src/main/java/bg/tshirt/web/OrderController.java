@@ -1,9 +1,10 @@
 package bg.tshirt.web;
 
-import bg.tshirt.database.dto.ClothPageDTO;
 import bg.tshirt.database.dto.OrderDTO;
 import bg.tshirt.database.dto.OrderPageDTO;
+import bg.tshirt.database.dto.OrdersDetailsDTO;
 import bg.tshirt.database.dto.UserDTO;
+import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.exceptions.UnauthorizedException;
 import bg.tshirt.service.OrderService;
 import bg.tshirt.service.UserService;
@@ -37,16 +38,10 @@ public class OrderController {
         try {
             UserDTO userDTO = this.userService.validateUser(request);
             this.orderService.createOrder(dto, userDTO);
-            return ResponseEntity.ok(Map.of(
-                    "status", "success",
-                    "message", "Order created for user"
-            ));
+            return successResponse("Order created for user");
         } catch (UnauthorizedException e) {
             this.orderService.createOrder(dto);
-            return ResponseEntity.ok(Map.of(
-                    "status", "success",
-                    "message", "Order created for anonymous user"
-            ));
+            return successResponse("Order created for anonymous user");
         }
     }
 
@@ -58,12 +53,8 @@ public class OrderController {
                                         HttpServletRequest request) {
         this.userService.validateAdmin(request);
 
-        if (!"oldest".equals(sort) &&
-                !"newest".equals(sort)) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "status", "error",
-                    "message", "Sort must be 'oldest', or 'newest'"
-            ));
+        if (!isValidSortOption(sort)) {
+            return badRequestResponse();
         }
 
         Pageable pageable = createPageable(page, size, sort);
@@ -79,8 +70,69 @@ public class OrderController {
         ));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOrder(@PathVariable Long id, HttpServletRequest request) {
+        this.userService.validateAdmin(request);
+
+        validateId(id);
+
+        OrdersDetailsDTO order = this.orderService.findOrderById(id);
+        if (order == null) {
+            throw new NotFoundException("Order with id: " + id + " was not found");
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "order", order
+        ));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateOrder(@PathVariable Long id,
+                                         @RequestParam(name = "status") String status,
+                                         HttpServletRequest request) {
+        this.userService.validateAdmin(request);
+
+        validateId(id);
+        validateStatus(status);
+
+        if (this.orderService.updateStatus(id, status)) {
+            return successResponse("Order status updated");
+        } else {
+            return ResponseEntity.ok(Map.of("status", "info", "message", "Order status is already the same"));
+        }
+    }
+
+    private void validateId(Long id) {
+        if (id == null || id < 0) {
+            throw new IllegalArgumentException("Id must be a positive number");
+        }
+    }
+
+    private void validateStatus(String status) {
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("Status must not be empty");
+        }
+
+        if (!"confirm".equals(status) && !"reject".equals(status) && !"pending".equals(status)) {
+            throw new IllegalArgumentException("Status must 'confirm', 'reject' or 'pending'");
+        }
+    }
+
+    private boolean isValidSortOption(String sort) {
+        return "oldest".equals(sort) || "newest".equals(sort);
+    }
+
     private Pageable createPageable(int page, int size, String sort) {
         Sort.Direction direction = sort.equals("oldest") ? Sort.Direction.ASC : Sort.Direction.DESC;
         return PageRequest.of(page - 1, size, Sort.by(direction, "createdAt"));
+    }
+
+    private ResponseEntity<?> successResponse(String message) {
+        return ResponseEntity.ok(Map.of("status", "success", "message", message));
+    }
+
+    private ResponseEntity<?> badRequestResponse() {
+        return ResponseEntity.badRequest().body(Map.of("status", "error", "message", "Sort must be 'oldest' or 'newest'"));
     }
 }

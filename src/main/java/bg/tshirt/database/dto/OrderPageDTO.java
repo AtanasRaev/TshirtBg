@@ -11,12 +11,12 @@ import java.util.List;
 public class OrderPageDTO {
     private Long id;
 
+    @JsonIgnore
+    private Instant createdAt;
+
     private String address;
 
     private List<OrderItemPageDTO> items;
-
-    @JsonIgnore
-    private Instant createdAt;
 
     @JsonProperty("created_at")
     public String createdAt() {
@@ -37,6 +37,14 @@ public class OrderPageDTO {
         this.id = id;
     }
 
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public String getAddress() {
         return address;
     }
@@ -51,13 +59,5 @@ public class OrderPageDTO {
 
     public void setItems(List<OrderItemPageDTO> items) {
         this.items = items;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
     }
 }

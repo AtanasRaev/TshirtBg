@@ -1,9 +1,6 @@
 package bg.tshirt.service.impl;
 
-import bg.tshirt.database.dto.OrderDTO;
-import bg.tshirt.database.dto.OrderItemDTO;
-import bg.tshirt.database.dto.OrderPageDTO;
-import bg.tshirt.database.dto.UserDTO;
+import bg.tshirt.database.dto.*;
 import bg.tshirt.database.entity.Cloth;
 import bg.tshirt.database.entity.Order;
 import bg.tshirt.database.entity.OrderItem;
@@ -22,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -87,6 +85,32 @@ public class OrderServiceImpl implements OrderService {
     public Page<OrderPageDTO> getAllOrdersByStatus(Pageable pageable, String status) {
         return this.orderRepository.findAllByStatus(pageable, status)
                 .map(order -> this.modelMapper.map(order, OrderPageDTO.class));
+    }
+
+    @Override
+    public OrdersDetailsDTO findOrderById(Long id) {
+        return this.orderRepository.findById(id)
+                .map(order -> this.modelMapper.map(order, OrdersDetailsDTO.class))
+                .orElse(null);
+    }
+
+    @Override
+    public boolean updateStatus(Long id, String status) {
+        Optional<Order> byId = this.orderRepository.findById(id);
+
+        if (byId.isEmpty()) {
+            throw new NotFoundException("Order with id: " + id + " was not found");
+        }
+        Order order = byId.get();
+
+        if (order.getStatus().equals(status)) {
+            return false;
+        }
+
+        order.setStatus(status);
+
+        this.orderRepository.save(order);
+        return true;
     }
 
     private User validateUser(UserDTO userDTO) {

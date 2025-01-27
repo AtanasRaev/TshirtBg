@@ -1,10 +1,7 @@
 package bg.tshirt.web;
 
 import bg.tshirt.config.JwtTokenProvider;
-import bg.tshirt.database.dto.UserDTO;
-import bg.tshirt.database.dto.UserLoginDTO;
-import bg.tshirt.database.dto.UserRegistrationDTO;
-import bg.tshirt.database.dto.UserResponseDTO;
+import bg.tshirt.database.dto.*;
 import bg.tshirt.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -36,11 +33,12 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(HttpServletRequest request) {
-        UserDTO user = this.userService.validateUser(request);
+        UserProfileDTO user = this.userService.getUserProfile(request);
 
         Map<String, Object> profile = Map.of(
                 "email", user.getEmail(),
-                "address", user.getAddress()
+                "address", user.getAddress(),
+                "orders", user.getOrders()
         );
 
         return ResponseEntity.ok(profile);
