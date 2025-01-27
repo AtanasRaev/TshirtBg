@@ -1,6 +1,7 @@
 package bg.tshirt.service.impl;
 
 import bg.tshirt.config.JwtTokenProvider;
+import bg.tshirt.database.dto.OrderPageDTO;
 import bg.tshirt.database.dto.UserDTO;
 import bg.tshirt.database.dto.UserProfileDTO;
 import bg.tshirt.database.dto.UserRegistrationDTO;
@@ -18,6 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -88,9 +90,19 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserProfileDTO getUserProfile(HttpServletRequest request) {
         UserDTO userDTO = validateUser(request);
-        return this.userRepository.findByEmail(userDTO.getEmail())
-                .map(user -> this.modelMapper.map(user, UserProfileDTO.class))
+
+        return userRepository.findByEmail(userDTO.getEmail())
+                .map(this::mapToUserProfileDTO)
                 .orElse(null);
+    }
+
+    private UserProfileDTO mapToUserProfileDTO(User user) {
+        UserProfileDTO userProfileDTO = modelMapper.map(user, UserProfileDTO.class);
+        List<OrderPageDTO> sortedOrders = userProfileDTO.getOrders().stream()
+                .sorted(Comparator.comparing(OrderPageDTO::getCreatedAt))
+                .toList();
+        userProfileDTO.setOrders(sortedOrders);
+        return userProfileDTO;
     }
 
     private void validateAdminRole(String token) {

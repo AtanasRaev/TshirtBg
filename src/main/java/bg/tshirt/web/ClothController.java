@@ -162,7 +162,7 @@ public class ClothController {
     }
 
     private Pageable createPageable(int page, int size, String sort) {
-        Sort.Direction direction = sort.equals("priceDesc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort.Direction direction = sort.equals("priceAsc") ? Sort.Direction.ASC : Sort.Direction.DESC;
         String sortProperty = sort.equals("saleCount") ? "saleCount" : "price";
         return PageRequest.of(page - 1, size, Sort.by(direction, sortProperty));
     }
