@@ -18,6 +18,15 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "second_name")
+    private String secondName;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     @Column
     private String address;
 
@@ -33,9 +42,18 @@ public class User {
     public User() {
     }
 
-    public User(String email, String password, String address, Set<Role> roles) {
+    public User(String email,
+                String password,
+                String firstName,
+                String secondName,
+                String phoneNumber,
+                String address,
+                Set<Role> roles) {
         this.email = email;
         this.password = password;
+        this.firstName = firstName;
+        this.secondName = secondName;
+        this.phoneNumber = phoneNumber;
         this.address = Objects.requireNonNullElse(address, "");
         this.roles = roles;
     }
@@ -62,6 +80,30 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getSecondName() {
+        return secondName;
+    }
+
+    public void setSecondName(String secondName) {
+        this.secondName = secondName;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getAddress() {

@@ -162,4 +162,8 @@ public class Cloth {
     public void setSaleCount(int saleCount) {
         this.saleCount = saleCount;
     }
+
+    public void updateTotalSales() {
+        this.saleCount += 1;
+    }
 }

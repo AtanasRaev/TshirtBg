@@ -4,8 +4,12 @@ import bg.tshirt.database.dto.ClothDTO;
 import bg.tshirt.database.dto.ClothDetailsPageDTO;
 import bg.tshirt.database.dto.ClothEditDTO;
 import bg.tshirt.database.dto.ClothPageDTO;
+import bg.tshirt.database.entity.Order;
+import bg.tshirt.database.entity.OrderItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface ClothService {
     boolean addCloth(ClothDTO clothAddDTO);
@@ -21,4 +25,6 @@ public interface ClothService {
     Page<ClothPageDTO> findByType(Pageable pageable, String type);
 
     Page<ClothPageDTO> findByTypeAndCategory(Pageable pageable, String type, String category);
+
+    void setTotalSales(List<OrderItem> items, String newStatus, String oldStatus);
 }

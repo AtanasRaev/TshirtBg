@@ -10,6 +10,7 @@ import bg.tshirt.database.repository.OrderRepository;
 import bg.tshirt.database.repository.UserRepository;
 import bg.tshirt.exceptions.BadRequestException;
 import bg.tshirt.exceptions.NotFoundException;
+import bg.tshirt.service.ClothService;
 import bg.tshirt.service.OrderService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -28,15 +29,18 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ClothRepository clothRepository;
     private final UserRepository userRepository;
+    private final ClothService clothService;
     private final ModelMapper modelMapper;
 
     public OrderServiceImpl(OrderRepository orderRepository,
                             ClothRepository clothRepository,
                             UserRepository userRepository,
+                            ClothService clothService,
                             ModelMapper modelMapper) {
         this.orderRepository = orderRepository;
         this.clothRepository = clothRepository;
         this.userRepository = userRepository;
+        this.clothService = clothService;
 
         this.modelMapper = modelMapper;
     }
@@ -108,6 +112,10 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order.setStatus(status);
+
+        if ("confirm".equals(status)) {
+            this.clothService.setTotalSales(order.getItems(), status, order.getStatus());
+        }
 
         this.orderRepository.save(order);
         return true;

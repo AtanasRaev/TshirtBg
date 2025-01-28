@@ -6,6 +6,8 @@ import bg.tshirt.database.dto.ClothDetailsPageDTO;
 import bg.tshirt.database.dto.ClothPageDTO;
 import bg.tshirt.database.entity.Cloth;
 import bg.tshirt.database.entity.Image;
+import bg.tshirt.database.entity.Order;
+import bg.tshirt.database.entity.OrderItem;
 import bg.tshirt.database.repository.ClothRepository;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothService;
@@ -109,6 +111,12 @@ public class ClothServiceImpl implements ClothService {
     public Page<ClothPageDTO> findByTypeAndCategory(Pageable pageable, String type, String category) {
         return this.clothRepository.findByTypeAndCategory(pageable, type, category)
                 .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
+    }
+
+    @Override
+    public void setTotalSales(List<OrderItem> items, String newStatus, String oldStatus) {
+        List<Cloth> allById = this.clothRepository.findAllById(items.stream().mapToLong(item -> item.getCloth().getId()).boxed().toList());
+        allById.forEach(Cloth::updateTotalSales);
     }
 
     private boolean isInvalidUpdate(ClothEditDTO clothDto, Cloth cloth) {
