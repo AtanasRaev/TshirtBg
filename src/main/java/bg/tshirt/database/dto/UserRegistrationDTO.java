@@ -1,6 +1,5 @@
 package bg.tshirt.database.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -14,14 +13,16 @@ public class UserRegistrationDTO {
     @Size(min = 4, message = "Password must be at least 4 characters long")
     private String password;
 
-    @JsonProperty("first_name")
+    @NotBlank(message = "First name cannot be empty")
+    @Size(min = 3, message = "First name must be at least 3 characters long")
     private String firstName;
 
-    @JsonProperty("second_name")
-    private String secondName;
+    @NotBlank(message = "Last name cannot be empty")
+    @Size(min = 3, message = "Last name must be at least 3 characters long")
+    private String lastName;
 
-    @JsonProperty("phone_number")
-    @Size(min = 9, max = 9)
+    @NotBlank(message = "Phone number cannot be empty")
+    @Size(min = 9, max = 9, message = "Phone number must be 9 numbers")
     private String phoneNumber;
 
     private String address;
@@ -53,12 +54,12 @@ public class UserRegistrationDTO {
         this.firstName = firstName;
     }
 
-    public String getSecondName() {
-        return secondName;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getPhoneNumber() {

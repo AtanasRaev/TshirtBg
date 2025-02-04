@@ -1,7 +1,6 @@
 package bg.tshirt.database.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -14,8 +13,6 @@ public class OrdersDetailsDTO {
     private String address;
 
     private UserDTO user;
-
-    @JsonProperty("total_price")
     private Double totalPrice;
 
     private String status;
@@ -28,7 +25,6 @@ public class OrdersDetailsDTO {
 
     private List<OrderItemDetailsDTO> items;
 
-    @JsonProperty("created_at")
     public String createdAt() {
         if (createdAt == null) {
             return null;
@@ -39,7 +35,6 @@ public class OrdersDetailsDTO {
         return formatter.format(createdAt);
     }
 
-    @JsonProperty("updated_at")
     public String updatedAt() {
         if (updatedAt == null) {
             return null;

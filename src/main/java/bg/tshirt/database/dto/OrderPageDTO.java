@@ -1,7 +1,6 @@
 package bg.tshirt.database.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -18,7 +17,6 @@ public class OrderPageDTO {
 
     private List<OrderItemPageDTO> items;
 
-    @JsonProperty("created_at")
     public String createdAt() {
         if (createdAt == null) {
             return null;

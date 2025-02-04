@@ -1,7 +1,9 @@
 package bg.tshirt.config;
 
+import bg.tshirt.service.impl.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -14,8 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import bg.tshirt.service.impl.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
@@ -33,24 +33,25 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> {
-                })
+                .cors(cors -> {})
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers(
-                                    "/user/login",
-                                    "/user/register",
-                                    "/cloth/details/**",
-                                    "/cloth/search",
-                                    "/cloth/category",
-                                    "/cloth/type",
-                                    "/order/create"
+                    auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                            .requestMatchers(
+                                    "/users/login",
+                                    "/users/register",
+                                    "/clothes/details/**",
+                                    "/clothes/search",
+                                    "/clothes/category",
+                                    "/clothes/type",
+                                    "/orders/create",
+                                    "/ping"
                             ).permitAll()
                             .requestMatchers(
-                                    "/user/profile",
-                                    "/cloth/add",
+                                    "/users/profile",
+                                    "/clothes/add",
                                     "/refresh-token",
-                                    "/cloth/edit/**",
-                                    "/order/list"
+                                    "/clothes/edit/**",
+                                    "/orders/list"
                             ).authenticated()
                             .anyRequest().authenticated();
                 })

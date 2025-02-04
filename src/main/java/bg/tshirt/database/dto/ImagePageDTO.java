@@ -1,11 +1,8 @@
 package bg.tshirt.database.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class ImagePageDTO {
     private String path;
 
-    @JsonProperty("public_id")
     private String publicId;
 
     public String getSide() {

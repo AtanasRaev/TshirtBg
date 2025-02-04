@@ -1,5 +1,6 @@
 package bg.tshirt.config;
 
+import bg.tshirt.exceptions.UnauthorizedException;
 import bg.tshirt.service.impl.CustomUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -42,32 +43,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        try {
-            String jwt = getJwtFromRequest(request);
+        String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt)) {
-                String currentFingerprint = tokenProvider.generateDeviceFingerprint(request);
+        if (StringUtils.hasText(jwt)) {
+            String currentFingerprint = tokenProvider.generateDeviceFingerprint(request);
 
-                if (tokenProvider.validateToken(jwt, currentFingerprint) && tokenProvider.isTokenTypeValid(jwt, "access")) {
-                    String email = tokenProvider.getEmailFromJwt(jwt);
-                    UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+            if (tokenProvider.validateToken(jwt, currentFingerprint) && tokenProvider.isTokenTypeValid(jwt, "access")) {
+                String email = tokenProvider.getEmailFromJwt(jwt);
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
 
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (ExpiredJwtException ex) {
-            logger.warn("JWT token has expired: path={}, ip={}, message={}",
-                    request.getRequestURI(), request.getRemoteAddr(), ex.getMessage());
-            response.setHeader("Token-Expired", "true");
-        } catch (Exception ex) {
-            logger.error("Failed to authenticate request: path={}, ip={}, reason={}",
-                    request.getRequestURI(), request.getRemoteAddr(), ex.getMessage());
         }
-
         filterChain.doFilter(request, response);
     }
 

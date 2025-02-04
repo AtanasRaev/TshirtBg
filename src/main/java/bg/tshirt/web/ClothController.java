@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/cloth")
+@RequestMapping("/clothes")
 public class ClothController {
     private final UserService userService;
     private final ClothService clothService;

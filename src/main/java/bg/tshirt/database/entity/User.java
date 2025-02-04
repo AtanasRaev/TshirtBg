@@ -18,13 +18,13 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "second_name")
-    private String secondName;
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
     @Column
@@ -52,7 +52,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
-        this.secondName = secondName;
+        this.lastName = secondName;
         this.phoneNumber = phoneNumber;
         this.address = Objects.requireNonNullElse(address, "");
         this.roles = roles;
@@ -90,12 +90,12 @@ public class User {
         this.firstName = firstName;
     }
 
-    public String getSecondName() {
-        return secondName;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
+    public void setLastName(String secondName) {
+        this.lastName = secondName;
     }
 
     public String getPhoneNumber() {

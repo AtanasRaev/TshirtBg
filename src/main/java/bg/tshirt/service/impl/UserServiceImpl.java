@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
                 registrationDTO.getEmail(),
                 this.passwordEncoder.encode(registrationDTO.getPassword()),
                 registrationDTO.getFirstName(),
-                registrationDTO.getSecondName(),
+                registrationDTO.getLastName(),
                 registrationDTO.getPhoneNumber(),
                 registrationDTO.getAddress(),
                 roles

@@ -7,10 +7,8 @@ public class UserResponseDTO {
 
     private String message;
 
-    @JsonProperty("access_token")
     private String accessToken;
 
-    @JsonProperty("refresh_token")
     private String refreshToken;
 
     public UserResponseDTO(String status, String message, String token, String refreshToken) {

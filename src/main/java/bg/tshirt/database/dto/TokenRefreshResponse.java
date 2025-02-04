@@ -1,21 +1,14 @@
 package bg.tshirt.database.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.time.Instant;
-import java.util.Date;
 
 public class TokenRefreshResponse {
-    @JsonProperty("access_token")
     private String accessToken;
 
-    @JsonProperty("refresh_token")
     private String refreshToken;
 
-    @JsonProperty("access_token_expiry")
     private Instant accessTokenExpiry;
 
-    @JsonProperty("refresh_token_expiry")
     private Instant refreshTokenExpiry;
 
     public TokenRefreshResponse(String accessToken,
