@@ -6,7 +6,6 @@ import bg.tshirt.database.dto.ClothDetailsPageDTO;
 import bg.tshirt.database.dto.ClothPageDTO;
 import bg.tshirt.database.entity.Cloth;
 import bg.tshirt.database.entity.Image;
-import bg.tshirt.database.entity.Order;
 import bg.tshirt.database.entity.OrderItem;
 import bg.tshirt.database.repository.ClothRepository;
 import bg.tshirt.exceptions.NotFoundException;
@@ -117,6 +116,24 @@ public class ClothServiceImpl implements ClothService {
     public void setTotalSales(List<OrderItem> items, String newStatus, String oldStatus) {
         List<Cloth> allById = this.clothRepository.findAllById(items.stream().mapToLong(item -> item.getCloth().getId()).boxed().toList());
         allById.forEach(Cloth::updateTotalSales);
+    }
+
+    @Override
+    public Page<ClothPageDTO> getNewest(Pageable pageable) {
+        return this.clothRepository.findAllDesc(pageable)
+                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
+    }
+
+    @Override
+    public Page<ClothPageDTO> getNewest(Pageable pageable, String type) {
+        return this.clothRepository.findAllWithTypeDesc(pageable, type)
+                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
+    }
+
+    @Override
+    public Page<ClothPageDTO> getMostSold(Pageable pageable) {
+        return this.clothRepository.findAllOrderBySaleCount(pageable)
+                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
     }
 
     private boolean isInvalidUpdate(ClothEditDTO clothDto, Cloth cloth) {

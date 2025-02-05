@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -27,5 +26,14 @@ public interface ClothRepository extends JpaRepository<Cloth, Long> {
     Page<Cloth> findByType(Pageable pageable, String type);
 
     @Query("SELECT c FROM Cloth c WHERE LOWER(c.type) LIKE LOWER(:type) AND LOWER(c.category) LIKE LOWER(:category)")
-    Page<Cloth> findByTypeAndCategory(Pageable pageable,@Param("type") String type,@Param("category") String category);
+    Page<Cloth> findByTypeAndCategory(Pageable pageable, @Param("type") String type, @Param("category") String category);
+
+    @Query("SELECT c FROM Cloth c ORDER BY c.id DESC")
+    Page<Cloth> findAllDesc(Pageable pageable);
+
+    @Query("SELECT c FROM Cloth c WHERE LOWER(c.type) LIKE LOWER(:type) ORDER BY c.id DESC")
+    Page<Cloth> findAllWithTypeDesc(Pageable pageable, @Param("type") String type);
+
+    @Query("SELECT c FROM Cloth c ORDER BY c.saleCount DESC")
+    Page<Cloth> findAllOrderBySaleCount(Pageable pageable);
 }

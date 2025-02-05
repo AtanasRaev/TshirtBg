@@ -1,6 +1,7 @@
 package bg.tshirt.web;
 
 import bg.tshirt.database.dto.*;
+import bg.tshirt.database.entity.enums.Type;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothService;
 import bg.tshirt.service.UserService;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -142,6 +144,29 @@ public class ClothController {
         return buildPagedResponse(clothPage);
     }
 
+    @GetMapping("/most-sold")
+    public ResponseEntity<?> searchByMostSoled(@RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
+                                               @RequestParam(defaultValue = "1") @Min(1) int page) {
+
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("saleCount"));
+        Page<ClothPageDTO> clothPage = this.clothService.getMostSold(pageable);
+
+        return buildPagedResponse(clothPage);
+    }
+
+
+    @GetMapping("/newest")
+    public ResponseEntity<?> getNewestCloth(@RequestParam(required = false) String type,
+                                            @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
+                                            @RequestParam(defaultValue = "1") @Min(1) int page) {
+
+
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
+        Page<ClothPageDTO> clothPage = getNewestClothes(pageable, type);
+
+        return buildPagedResponse(clothPage);
+    }
+
     private ResponseEntity<?> validateInputs(String name, String sort) {
         if (name == null || name.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of(
@@ -184,5 +209,11 @@ public class ClothController {
         } else {
             return this.clothService.findByType(pageable, type);
         }
+    }
+
+    private Page<ClothPageDTO> getNewestClothes(Pageable pageable, String type) {
+        return StringUtils.hasText(type)
+                ? clothService.getNewest(pageable, type)
+                : clothService.getNewest(pageable);
     }
 }

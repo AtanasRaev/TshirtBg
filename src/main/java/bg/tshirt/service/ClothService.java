@@ -27,4 +27,10 @@ public interface ClothService {
     Page<ClothPageDTO> findByTypeAndCategory(Pageable pageable, String type, String category);
 
     void setTotalSales(List<OrderItem> items, String newStatus, String oldStatus);
+
+    Page<ClothPageDTO> getNewest(Pageable pageable);
+
+    Page<ClothPageDTO> getNewest(Pageable pageable, String type);
+
+    Page<ClothPageDTO> getMostSold(Pageable pageable);
 }

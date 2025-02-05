@@ -46,6 +46,8 @@ public class SecurityConfig {
                                     "/clothes/type",
                                     "/orders/create",
                                     "/refresh-token",
+                                    "/clothes/newest",
+                                    "/clothes/most-sold",
                                     "/ping"
                             ).permitAll()
                             .requestMatchers(
