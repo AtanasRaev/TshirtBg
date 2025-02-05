@@ -2,6 +2,7 @@ package bg.tshirt.web;
 
 import bg.tshirt.config.JwtTokenProvider;
 import bg.tshirt.database.dto.*;
+import bg.tshirt.service.RefreshTokenService;
 import bg.tshirt.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -22,13 +23,16 @@ public class UserController {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final RefreshTokenService refreshTokenService;
 
     public UserController(UserService userService,
                           JwtTokenProvider jwtTokenProvider,
-                          AuthenticationManager authenticationManager) {
+                          AuthenticationManager authenticationManager,
+                          RefreshTokenService refreshTokenService) {
         this.userService = userService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @GetMapping("/profile")
@@ -60,6 +64,12 @@ public class UserController {
         String accessToken = jwtTokenProvider.generateAccessToken(authentication, currentFingerprint);
         String refreshToken = jwtTokenProvider.generateRefreshToken(registrationDTO.getEmail(), currentFingerprint);
 
+        this.refreshTokenService.saveNewToken(
+                jwtTokenProvider.getJtiFromJwt(refreshToken),
+                registrationDTO.getEmail(),
+                jwtTokenProvider.getExpirationDate(refreshToken)
+        );
+
         return ResponseEntity.ok(new UserResponseDTO("success", "Registration successful", accessToken, refreshToken));
     }
 
@@ -76,6 +86,12 @@ public class UserController {
 
         String accessToken = jwtTokenProvider.generateAccessToken(authentication, currentFingerprint);
         String refreshToken = jwtTokenProvider.generateRefreshToken(loginRequest.getEmail(), currentFingerprint);
+
+        this.refreshTokenService.saveNewToken(
+                jwtTokenProvider.getJtiFromJwt(refreshToken),
+                loginRequest.getEmail(),
+                jwtTokenProvider.getExpirationDate(refreshToken)
+        );
 
         return ResponseEntity.ok(new UserResponseDTO("success", "Login successful", accessToken, refreshToken));
     }

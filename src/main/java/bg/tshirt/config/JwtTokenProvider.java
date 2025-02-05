@@ -1,5 +1,6 @@
 package bg.tshirt.config;
 
+import bg.tshirt.service.RefreshTokenService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -39,7 +40,12 @@ public class JwtTokenProvider {
 
     private Key key;
 
+    private final RefreshTokenService refreshTokenService;
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
+
+    public JwtTokenProvider(RefreshTokenService refreshTokenService) {
+        this.refreshTokenService = refreshTokenService;
+    }
 
     @PostConstruct
     public void init() {
@@ -144,11 +150,10 @@ public class JwtTokenProvider {
         String screenResolution = Optional.ofNullable(request.getHeader("screenResolution")).orElse("Unknown Resolution");
         String timezone = Optional.ofNullable(request.getHeader("timezone")).orElse("Unknown Timezone");
         String language = Optional.ofNullable(request.getHeader("Accept-Language")).orElse("Unknown Language");
-        String plugins = Optional.ofNullable(request.getHeader("plugins")).orElse("Unknown Plugins");
         String hardwareConcurrency = Optional.ofNullable(request.getHeader("hardwareConcurrency")).orElse("Unknown Hardware");
         String deviceMemory = Optional.ofNullable(request.getHeader("deviceMemory")).orElse("Unknown Memory");
 
-        String fingerprint = userAgent + screenResolution + timezone + language + plugins + hardwareConcurrency + deviceMemory;
+        String fingerprint = userAgent + screenResolution + timezone + language + hardwareConcurrency + deviceMemory;
         return hashFunction(fingerprint);
     }
 

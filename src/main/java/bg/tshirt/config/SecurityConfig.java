@@ -33,7 +33,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> {})
+                .cors(cors -> {
+                })
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                             .requestMatchers(
@@ -44,12 +45,12 @@ public class SecurityConfig {
                                     "/clothes/category",
                                     "/clothes/type",
                                     "/orders/create",
+                                    "/refresh-token",
                                     "/ping"
                             ).permitAll()
                             .requestMatchers(
                                     "/users/profile",
                                     "/clothes/add",
-                                    "/refresh-token",
                                     "/clothes/edit/**",
                                     "/orders/list"
                             ).authenticated()

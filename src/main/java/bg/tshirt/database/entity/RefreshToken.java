@@ -3,7 +3,6 @@ package bg.tshirt.database.entity;
 import jakarta.persistence.*;
 
 import java.time.Instant;
-import java.util.Date;
 
 @Entity
 @Table(name = "refresh_tokens")
@@ -12,11 +11,18 @@ public class RefreshToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
     private String tokenId;
+
+    @Column
     private String userEmail;
+
+    @Column
     private Instant expiryDate;
+
+    @Column
     private boolean revoked;
-    private String deviceId;
+
 
     public Long getId() {
         return id;
@@ -56,14 +62,6 @@ public class RefreshToken {
 
     public void setRevoked(boolean revoked) {
         this.revoked = revoked;
-    }
-
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
     }
 }
 

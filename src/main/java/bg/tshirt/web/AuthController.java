@@ -1,7 +1,6 @@
 package bg.tshirt.web;
 
 import bg.tshirt.config.JwtTokenProvider;
-import bg.tshirt.database.dto.TokenRefreshRequest;
 import bg.tshirt.database.dto.TokenRefreshResponse;
 import bg.tshirt.service.impl.CustomUserDetailsService;
 import bg.tshirt.service.impl.RefreshTokenServiceImpl;
@@ -16,8 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
@@ -42,13 +41,17 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> refreshToken(HttpServletRequest httpRequest) {
         if (isRateLimitExceeded(httpRequest)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                     .body(Map.of("message", "Too many requests. Please try again later."));
         }
 
-        String refreshToken = request.getRefreshToken();
+        String refreshToken = httpRequest.getHeader("Refresh-Token");
+        if (!StringUtils.hasText(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Refresh token is missing"));
+        }
 
         try {
             if (!isRefreshTokenValid(refreshToken, httpRequest)) {
@@ -73,7 +76,11 @@ public class AuthController {
 
             TokenRefreshResponse tokenResponse = generateNewTokens(email, httpRequest);
 
-            refreshTokenService.saveNewToken(jwtTokenProvider.getJtiFromJwt(tokenResponse.getRefreshToken()), email, tokenResponse.getRefreshTokenExpiry());
+            refreshTokenService.saveNewToken(
+                    jwtTokenProvider.getJtiFromJwt(tokenResponse.getRefreshToken()),
+                    email,
+                    tokenResponse.getRefreshTokenExpiry()
+            );
 
             return ResponseEntity.ok(tokenResponse);
         } catch (ExpiredJwtException ex) {
@@ -84,6 +91,7 @@ public class AuthController {
                     .body(Map.of("message", "Invalid refresh token"));
         }
     }
+
 
     private boolean isRateLimitExceeded(HttpServletRequest httpRequest) {
         String clientIp = httpRequest.getRemoteAddr();

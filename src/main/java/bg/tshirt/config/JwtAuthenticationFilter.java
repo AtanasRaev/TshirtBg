@@ -1,8 +1,8 @@
 package bg.tshirt.config;
 
-import bg.tshirt.exceptions.UnauthorizedException;
 import bg.tshirt.service.impl.CustomUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,9 +46,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = getJwtFromRequest(request);
 
         if (StringUtils.hasText(jwt)) {
-            String currentFingerprint = tokenProvider.generateDeviceFingerprint(request);
+            try {
+                tokenProvider.getExpirationDate(jwt);
+            } catch (ExpiredJwtException ex) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"Token has expired\"}");
+                return;
+            } catch (JwtException ex) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"Invalid token\"}");
+                return;
+            }
 
-            if (tokenProvider.validateToken(jwt, currentFingerprint) && tokenProvider.isTokenTypeValid(jwt, "access")) {
+            String currentFingerprint = tokenProvider.generateDeviceFingerprint(request);
+            if (tokenProvider.validateToken(jwt, currentFingerprint) &&
+                    tokenProvider.isTokenTypeValid(jwt, "access")) {
+
                 String email = tokenProvider.getEmailFromJwt(jwt);
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
 
@@ -59,6 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
+
         filterChain.doFilter(request, response);
     }
 
@@ -69,4 +85,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
 }

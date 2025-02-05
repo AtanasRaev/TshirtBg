@@ -13,11 +13,36 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("https://clothing-website-1.web.app", "http://localhost:*"));
+        config.setAllowedOriginPatterns(List.of(
+                "https://clothing-website-1.web.app",
+                "http://localhost:*"
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedHeaders(List.of(
+                "Content-Type",
+                "Authorization",
+                "screenResolution",
+                "timezone",
+                "hardwareConcurrency",
+                "deviceMemory",
+                "Accept",
+                "User-Agent",
+                "Accept-Language",
+                "Refresh-Token"
+        ));
         config.setAllowCredentials(true);
-        config.setExposedHeaders(List.of("Authorization"));
+        config.setExposedHeaders(List.of(
+                "screenResolution",
+                "timezone",
+                "hardwareConcurrency",
+                "deviceMemory",
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "User-Agent",
+                "Accept-Language",
+                "Refresh-Token"
+        ));
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
