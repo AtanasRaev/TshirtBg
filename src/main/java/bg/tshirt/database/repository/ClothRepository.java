@@ -19,13 +19,13 @@ public interface ClothRepository extends JpaRepository<Cloth, Long> {
     @Query("SELECT c FROM Cloth c WHERE LOWER(c.name) LIKE LOWER(:query) OR LOWER(c.model) LIKE LOWER(:query)")
     Page<Cloth> findByQuery(Pageable pageable, @Param("query") String query);
 
-    @Query("SELECT c FROM Cloth c WHERE LOWER(c.category) LIKE LOWER(:query)")
-    Page<Cloth> findByCategory(Pageable pageable, @Param("query") String query);
+    @Query("SELECT c FROM Cloth c WHERE LOWER(c.category) LIKE LOWER(:category) ORDER BY c.saleCount DESC")
+    Page<Cloth> findByCategory(Pageable pageable, @Param("category") String category);
 
-    @Query("SELECT c FROM Cloth c WHERE LOWER(c.type) LIKE LOWER(:type)")
-    Page<Cloth> findByType(Pageable pageable, String type);
+    @Query("SELECT c FROM Cloth c WHERE LOWER(c.type) LIKE LOWER(:type) ORDER BY c.saleCount DESC")
+    Page<Cloth> findByType(Pageable pageable, @Param("type") String type);
 
-    @Query("SELECT c FROM Cloth c WHERE LOWER(c.type) LIKE LOWER(:type) AND LOWER(c.category) LIKE LOWER(:category)")
+    @Query("SELECT c FROM Cloth c WHERE LOWER(c.type) LIKE LOWER(:type) AND LOWER(c.category) LIKE LOWER(:category) ORDER BY c.saleCount DESC")
     Page<Cloth> findByTypeAndCategory(Pageable pageable, @Param("type") String type, @Param("category") String category);
 
     @Query("SELECT c FROM Cloth c ORDER BY c.id DESC")

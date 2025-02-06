@@ -94,66 +94,34 @@ public class ClothController {
 
     @GetMapping("/search")
     public ResponseEntity<?> searchCloth(@RequestParam(name = "name") String name,
-                                         @RequestParam(name = "sort", defaultValue = "saleCount") String sort,
                                          @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
                                          @RequestParam(defaultValue = "1") @Min(1) int page) {
-        ResponseEntity<?> validationResponse = validateInputs(name, sort);
 
-        if (validationResponse != null) {
-            return validationResponse;
+        if (name == null || name.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", "Query parameter 'name' cannot be empty"
+            ));
         }
 
-        Pageable pageable = createPageable(page, size, sort);
+        Pageable pageable = PageRequest.of(page - 1, size);
         Page<?> clothPage = this.clothService.findByQuery(pageable, name);
 
         return buildPagedResponse(clothPage);
     }
 
-    @GetMapping("/category")
-    public ResponseEntity<?> searchByCategory(@RequestParam(name = "name") String name,
-                                              @RequestParam(name = "sort", defaultValue = "saleCount") String sort,
-                                              @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
-                                              @RequestParam(defaultValue = "1") @Min(1) int page) {
-        ResponseEntity<?> validationResponse = validateInputs(name, sort);
-
-        if (validationResponse != null) {
-            return validationResponse;
-        }
-
-        Pageable pageable = createPageable(page, size, sort);
-        Page<?> clothPage = this.clothService.findByCategory(pageable, name);
-
-        return buildPagedResponse(clothPage);
-    }
-
-    @GetMapping("/type")
-    public ResponseEntity<?> searchByType(@RequestParam(name = "name") String name,
-                                          @RequestParam(name = "sort", defaultValue = "saleCount") String sort,
-                                          @RequestParam(name = "category", required = false) String category,
-                                          @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
-                                          @RequestParam(defaultValue = "1") @Min(1) int page) {
-        ResponseEntity<?> validationResponse = validateInputs(name, sort);
-
-        if (validationResponse != null) {
-            return validationResponse;
-        }
-
-        Pageable pageable = createPageable(page, size, sort);
-        Page<ClothPageDTO> clothPage = getClothsByTypeAndCategory(pageable, name, category);
-
-        return buildPagedResponse(clothPage);
-    }
-
     @GetMapping("/most-sold")
-    public ResponseEntity<?> searchByMostSoled(@RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
+    public ResponseEntity<?> searchByMostSoled(@RequestParam(required = false) String type,
+                                               @RequestParam(required = false) String category,
+                                               @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
                                                @RequestParam(defaultValue = "1") @Min(1) int page) {
 
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("saleCount"));
-        Page<ClothPageDTO> clothPage = this.clothService.getMostSold(pageable);
+        Page<ClothPageDTO> clothPage = getMostSoldClothes(pageable, type, category);
+
 
         return buildPagedResponse(clothPage);
     }
-
 
     @GetMapping("/newest")
     public ResponseEntity<?> getNewestCloth(@RequestParam(required = false) String type,
@@ -167,28 +135,27 @@ public class ClothController {
         return buildPagedResponse(clothPage);
     }
 
-    private ResponseEntity<?> validateInputs(String name, String sort) {
-        if (name == null || name.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "status", "error",
-                    "message", "Query parameter 'name' cannot be empty"
-            ));
+    private Page<ClothPageDTO> getMostSoldClothes(Pageable pageable, String type, String category) {
+        if (StringUtils.hasText(type) && StringUtils.hasText(category)) {
+            return this.clothService.findByTypeAndCategory(pageable, type, category);
+        } else if (StringUtils.hasText(type)) {
+            return this.clothService.findByType(pageable, type);
+        } else if (StringUtils.hasText(category)) {
+            return this.clothService.findByCategory(pageable, category);
+        } else {
+            return this.clothService.getMostSold(pageable);
         }
+    }
 
-        if (!"saleCount".equals(sort) &&
-                !"priceDesc".equals(sort) &&
-                !"priceAsc".equals(sort)) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "status", "error",
-                    "message", "Sort must be 'saleCount', 'priceDesc', or 'priceAsc'"
-            ));
-        }
-        return null;
+    private Page<ClothPageDTO> getNewestClothes(Pageable pageable, String type) {
+        return StringUtils.hasText(type)
+                ? clothService.getNewest(pageable, type)
+                : clothService.getNewest(pageable);
     }
 
     private Pageable createPageable(int page, int size, String sort) {
         Sort.Direction direction = sort.equals("priceAsc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-        String sortProperty = sort.equals("saleCount") ? "saleCount" : "price";
+        String sortProperty = sort.equals("saleCount") ? "sa0leCount" : "price";
         return PageRequest.of(page - 1, size, Sort.by(direction, sortProperty));
     }
 
@@ -199,21 +166,7 @@ public class ClothController {
                 "total_items", clothPage.getTotalElements(),
                 "total_pages", clothPage.getTotalPages(),
                 "current_page", clothPage.getNumber() + 1,
-                "cloths", clothPage.getContent()
+                "clothes", clothPage.getContent()
         ));
-    }
-
-    private Page<ClothPageDTO> getClothsByTypeAndCategory(Pageable pageable, String type, String category) {
-        if (category != null && !category.isBlank()) {
-            return this.clothService.findByTypeAndCategory(pageable, type, category);
-        } else {
-            return this.clothService.findByType(pageable, type);
-        }
-    }
-
-    private Page<ClothPageDTO> getNewestClothes(Pageable pageable, String type) {
-        return StringUtils.hasText(type)
-                ? clothService.getNewest(pageable, type)
-                : clothService.getNewest(pageable);
     }
 }
