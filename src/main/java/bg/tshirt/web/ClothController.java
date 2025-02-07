@@ -48,7 +48,7 @@ public class ClothController {
         ));
     }
 
-    @GetMapping("/details/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getClothById(@PathVariable("id") Long id) {
         if (id == null || id < 1) {
             return ResponseEntity.badRequest().body(Map.of(
@@ -64,11 +64,11 @@ public class ClothController {
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
-                dto.getType(), dto
+                "clothing", dto
         ));
     }
 
-    @PutMapping("/edit/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> editClothById(@PathVariable("id") Long id, @ModelAttribute @Valid ClothEditDTO clothDto, HttpServletRequest request) {
         //TODO: Think about changing the model of a cloth for the public id
         if (id == null || id < 1) {
@@ -89,6 +89,29 @@ public class ClothController {
                 "message", "Cloth edited successfully!",
                 "cloth_name", clothDto.getName(),
                 "edited_by", admin.getEmail()
+        ));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteClothById(@PathVariable("id") Long id, HttpServletRequest request) {
+        if (id == null || id < 1) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", "Id must be a positive number"
+            ));
+        }
+
+        UserDTO admin = this.userService.validateAdmin(request);
+
+        if (!this.clothService.delete(id)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", String.format("Cloth with id: %d was not found", id)));
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "message", "Cloth with id: " + id + " was deleted successfully!",
+                "deleted_by", admin.getEmail()
         ));
     }
 

@@ -5,7 +5,6 @@ import bg.tshirt.database.entity.enums.Gender;
 import bg.tshirt.database.entity.enums.Type;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ClothDTO {
@@ -14,10 +13,6 @@ public class ClothDTO {
 
     @NotBlank(message = "Description cannot be blank.")
     private String description;
-
-    @NotNull(message = "Price cannot be null.")
-    @Positive(message = "Price must be greater than 0.")
-    private Double price;
 
     @NotNull(message = "Type cannot be null.")
     private Type type;
@@ -49,14 +44,6 @@ public class ClothDTO {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
     }
 
     public Type getType() {

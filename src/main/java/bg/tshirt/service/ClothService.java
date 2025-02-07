@@ -33,4 +33,6 @@ public interface ClothService {
     Page<ClothPageDTO> getNewest(Pageable pageable, String type);
 
     Page<ClothPageDTO> getMostSold(Pageable pageable);
+
+    boolean delete(Long id);
 }

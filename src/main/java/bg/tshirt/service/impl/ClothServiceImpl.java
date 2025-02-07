@@ -7,6 +7,7 @@ import bg.tshirt.database.dto.ClothPageDTO;
 import bg.tshirt.database.entity.Cloth;
 import bg.tshirt.database.entity.Image;
 import bg.tshirt.database.entity.OrderItem;
+import bg.tshirt.database.entity.enums.Type;
 import bg.tshirt.database.repository.ClothRepository;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothService;
@@ -45,12 +46,11 @@ public class ClothServiceImpl implements ClothService {
 
         Cloth cloth = new Cloth(clothDTO.getName(),
                 clothDTO.getDescription(),
-                clothDTO.getPrice(),
+                setPrice(clothDTO.getType()),
                 clothDTO.getModel(),
                 clothDTO.getType(),
                 clothDTO.getGender(),
                 clothDTO.getCategory());
-
 
         List<Image> images = new ArrayList<>();
         addNewImages(clothDTO, cloth, images);
@@ -77,7 +77,7 @@ public class ClothServiceImpl implements ClothService {
             return false;
         }
 
-        updateClothDetails(cloth, clothDto);
+        setClothDetails(cloth, clothDto);
 
         List<Image> updatedImages = processImages(clothDto, cloth);
 
@@ -136,6 +136,33 @@ public class ClothServiceImpl implements ClothService {
                 .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
     }
 
+    @Override
+    public boolean delete(Long id) {
+        Optional<Cloth> optional = this.clothRepository.findById(id);
+
+        if (optional.isEmpty()) {
+            return false;
+        }
+
+        this.clothRepository.delete(optional.get());
+
+        return true;
+    }
+
+    private Double setPrice(Type type) {
+        double price;
+
+        switch (type) {
+            case T_SHIRT -> price = 29.00;
+            case SWEATSHIRT -> price = 54.00;
+            case KIT -> price = 59.00;
+            case SHORTS -> price = 30.00;
+            default -> price = 37.00;
+        }
+
+        return price;
+    }
+
     private boolean isInvalidUpdate(ClothEditDTO clothDto, Cloth cloth) {
         boolean frontAndBackImagesEmpty = clothDto.getFrontImage() != null && clothDto.getFrontImage().isEmpty()
                 && clothDto.getBackImage() != null && clothDto.getBackImage().isEmpty();
@@ -144,10 +171,10 @@ public class ClothServiceImpl implements ClothService {
         return frontAndBackImagesEmpty && removingAllImages;
     }
 
-    private void updateClothDetails(Cloth cloth, ClothEditDTO clothDto) {
+    private void setClothDetails(Cloth cloth, ClothEditDTO clothDto) {
         cloth.setName(clothDto.getName());
         cloth.setDescription(clothDto.getDescription());
-        cloth.setPrice(clothDto.getPrice());
+        cloth.setPrice(setPrice(clothDto.getType()));
         cloth.setModel(clothDto.getModel());
         cloth.setType(clothDto.getType());
         cloth.setGender(clothDto.getGender());
