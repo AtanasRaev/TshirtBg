@@ -1,7 +1,7 @@
 package bg.tshirt.service.impl;
 
-import bg.tshirt.database.dto.ClothDTO;
-import bg.tshirt.database.entity.Cloth;
+import bg.tshirt.database.dto.ClothingDTO;
+import bg.tshirt.database.entity.Clothing;
 import bg.tshirt.database.entity.Image;
 import bg.tshirt.database.repository.ImageRepository;
 import bg.tshirt.service.ImageService;
@@ -26,7 +26,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Image uploadImage(MultipartFile multipartFile, String publicId, Cloth cloth) {
+    public Image uploadImage(MultipartFile multipartFile, String publicId, Clothing cloth) {
         try {
             Map<?, ?> uploadResult = this.cloudinary.uploader().upload(multipartFile.getBytes(), ObjectUtils.asMap(
                     "public_id", publicId)
@@ -64,7 +64,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public List<Image> saveImagesInCloud(ClothDTO clothDTO, Cloth cloth) {
+    public List<Image> saveImagesInCloud(ClothingDTO clothDTO, Clothing cloth) {
         Image front = saveImageInCloud(clothDTO.getFrontImage(), cloth, "F");
         Image back = saveImageInCloud(clothDTO.getBackImage(), cloth, "B");
 
@@ -72,7 +72,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Image saveImageInCloud(MultipartFile file, Cloth cloth, String side) {
+    public Image saveImageInCloud(MultipartFile file, Clothing cloth, String side) {
         if (file == null || file.isEmpty()) {
             return null;
         }

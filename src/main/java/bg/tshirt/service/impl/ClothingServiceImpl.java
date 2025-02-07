@@ -1,16 +1,16 @@
 package bg.tshirt.service.impl;
 
-import bg.tshirt.database.dto.ClothDTO;
+import bg.tshirt.database.dto.ClothingDTO;
 import bg.tshirt.database.dto.ClothEditDTO;
-import bg.tshirt.database.dto.ClothDetailsPageDTO;
-import bg.tshirt.database.dto.ClothPageDTO;
-import bg.tshirt.database.entity.Cloth;
+import bg.tshirt.database.dto.ClothingDetailsPageDTO;
+import bg.tshirt.database.dto.ClothingPageDTO;
+import bg.tshirt.database.entity.Clothing;
 import bg.tshirt.database.entity.Image;
 import bg.tshirt.database.entity.OrderItem;
 import bg.tshirt.database.entity.enums.Type;
-import bg.tshirt.database.repository.ClothRepository;
+import bg.tshirt.database.repository.ClothingRepository;
 import bg.tshirt.exceptions.NotFoundException;
-import bg.tshirt.service.ClothService;
+import bg.tshirt.service.ClothingService;
 import bg.tshirt.service.ImageService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -23,28 +23,28 @@ import java.util.Optional;
 
 
 @Service
-public class ClothServiceImpl implements ClothService {
-    private final ClothRepository clothRepository;
+public class ClothingServiceImpl implements ClothingService {
+    private final ClothingRepository clothRepository;
     private final ImageService imageService;
     private final ModelMapper modelMapper;
 
-    public ClothServiceImpl(ClothRepository clothRepository,
-                            ImageService imageService,
-                            ModelMapper modelMapper) {
+    public ClothingServiceImpl(ClothingRepository clothRepository,
+                               ImageService imageService,
+                               ModelMapper modelMapper) {
         this.clothRepository = clothRepository;
         this.imageService = imageService;
         this.modelMapper = modelMapper;
     }
 
     @Override
-    public boolean addCloth(ClothDTO clothDTO) {
-        Optional<Cloth> optional = this.clothRepository.findByModelAndTypeAndGender(clothDTO.getModel(), clothDTO.getType(), clothDTO.getGender());
+    public boolean addCloth(ClothingDTO clothDTO) {
+        Optional<Clothing> optional = this.clothRepository.findByModelAndTypeAndGender(clothDTO.getModel(), clothDTO.getType(), clothDTO.getGender());
 
         if (optional.isPresent()) {
             return false;
         }
 
-        Cloth cloth = new Cloth(clothDTO.getName(),
+        Clothing cloth = new Clothing(clothDTO.getName(),
                 clothDTO.getDescription(),
                 setPrice(clothDTO.getType()),
                 clothDTO.getModel(),
@@ -62,15 +62,15 @@ public class ClothServiceImpl implements ClothService {
     }
 
     @Override
-    public ClothDetailsPageDTO findById(Long id) {
+    public ClothingDetailsPageDTO findById(Long id) {
         return this.clothRepository.findById(id)
-                .map(cloth -> this.modelMapper.map(cloth, ClothDetailsPageDTO.class))
+                .map(cloth -> this.modelMapper.map(cloth, ClothingDetailsPageDTO.class))
                 .orElse(null);
     }
 
     @Override
     public boolean editCloth(ClothEditDTO clothDto, Long id) {
-        Cloth cloth = this.clothRepository.findById(id)
+        Clothing cloth = this.clothRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Cloth with id: %d is not found", id)));
 
         if (isInvalidUpdate(clothDto, cloth)) {
@@ -89,61 +89,67 @@ public class ClothServiceImpl implements ClothService {
     }
 
     @Override
-    public Page<ClothPageDTO> findByQuery(Pageable pageable, String query) {
+    public Page<ClothingPageDTO> findByQuery(Pageable pageable, String query) {
         return this.clothRepository.findByQuery(pageable, "%" + query + "%")
-                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
+                .map(cloth -> this.modelMapper.map(cloth, ClothingPageDTO.class));
     }
 
     @Override
-    public Page<ClothPageDTO> findByCategory(Pageable pageable, String query) {
+    public Page<ClothingPageDTO> findByCategory(Pageable pageable, String query) {
         return this.clothRepository.findByCategory(pageable, query)
-                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
+                .map(cloth -> this.modelMapper.map(cloth, ClothingPageDTO.class));
     }
 
     @Override
-    public Page<ClothPageDTO> findByType(Pageable pageable, String type) {
+    public Page<ClothingPageDTO> findByType(Pageable pageable, String type) {
         return this.clothRepository.findByType(pageable, type)
-                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
+                .map(cloth -> this.modelMapper.map(cloth, ClothingPageDTO.class));
     }
 
     @Override
-    public Page<ClothPageDTO> findByTypeAndCategory(Pageable pageable, String type, String category) {
+    public Page<ClothingPageDTO> findByTypeAndCategory(Pageable pageable, String type, String category) {
         return this.clothRepository.findByTypeAndCategory(pageable, type, category)
-                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
+                .map(cloth -> this.modelMapper.map(cloth, ClothingPageDTO.class));
     }
 
     @Override
     public void setTotalSales(List<OrderItem> items, String newStatus, String oldStatus) {
-        List<Cloth> allById = this.clothRepository.findAllById(items.stream().mapToLong(item -> item.getCloth().getId()).boxed().toList());
-        allById.forEach(Cloth::updateTotalSales);
+        List<Clothing> allById = this.clothRepository.findAllById(items.stream().mapToLong(item -> item.getCloth().getId()).boxed().toList());
+        allById.forEach(Clothing::updateTotalSales);
     }
 
     @Override
-    public Page<ClothPageDTO> getNewest(Pageable pageable) {
+    public Page<ClothingPageDTO> getNewest(Pageable pageable) {
         return this.clothRepository.findAllDesc(pageable)
-                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
+                .map(cloth -> this.modelMapper.map(cloth, ClothingPageDTO.class));
     }
 
     @Override
-    public Page<ClothPageDTO> getNewest(Pageable pageable, String type) {
+    public Page<ClothingPageDTO> getNewest(Pageable pageable, String type) {
         return this.clothRepository.findAllWithTypeDesc(pageable, type)
-                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
+                .map(cloth -> this.modelMapper.map(cloth, ClothingPageDTO.class));
     }
 
     @Override
-    public Page<ClothPageDTO> getMostSold(Pageable pageable) {
+    public Page<ClothingPageDTO> getMostSold(Pageable pageable) {
         return this.clothRepository.findAllOrderBySaleCount(pageable)
-                .map(cloth -> this.modelMapper.map(cloth, ClothPageDTO.class));
+                .map(cloth -> this.modelMapper.map(cloth, ClothingPageDTO.class));
     }
 
     @Override
     public boolean delete(Long id) {
-        Optional<Cloth> optional = this.clothRepository.findById(id);
+        Optional<Clothing> optional = this.clothRepository.findById(id);
 
         if (optional.isEmpty()) {
             return false;
         }
 
+        List<String> publicIds = optional.get().getImages()
+                .stream()
+                .map(Image::getPublicId)
+                .toList();
+
+        this.imageService.deleteAll(publicIds);
         this.clothRepository.delete(optional.get());
 
         return true;
@@ -163,7 +169,7 @@ public class ClothServiceImpl implements ClothService {
         return price;
     }
 
-    private boolean isInvalidUpdate(ClothEditDTO clothDto, Cloth cloth) {
+    private boolean isInvalidUpdate(ClothEditDTO clothDto, Clothing cloth) {
         boolean frontAndBackImagesEmpty = clothDto.getFrontImage() != null && clothDto.getFrontImage().isEmpty()
                 && clothDto.getBackImage() != null && clothDto.getBackImage().isEmpty();
         boolean removingAllImages = clothDto.getRemovedImages().size() >= cloth.getImages().size();
@@ -171,7 +177,7 @@ public class ClothServiceImpl implements ClothService {
         return frontAndBackImagesEmpty && removingAllImages;
     }
 
-    private void setClothDetails(Cloth cloth, ClothEditDTO clothDto) {
+    private void setClothDetails(Clothing cloth, ClothEditDTO clothDto) {
         cloth.setName(clothDto.getName());
         cloth.setDescription(clothDto.getDescription());
         cloth.setPrice(setPrice(clothDto.getType()));
@@ -181,7 +187,7 @@ public class ClothServiceImpl implements ClothService {
         cloth.setCategory(clothDto.getCategory());
     }
 
-    private List<Image> processImages(ClothEditDTO clothDto, Cloth cloth) {
+    private List<Image> processImages(ClothEditDTO clothDto, Clothing cloth) {
         List<String> removedImagesPaths = clothDto.getRemovedImages();
         List<Image> imagesToSave = new ArrayList<>();
 
@@ -216,7 +222,7 @@ public class ClothServiceImpl implements ClothService {
         });
     }
 
-    private void addNewImages(ClothDTO clothDto, Cloth cloth, List<Image> imagesToSave) {
+    private void addNewImages(ClothingDTO clothDto, Clothing cloth, List<Image> imagesToSave) {
         if (clothDto.getFrontImage() != null && !clothDto.getFrontImage().isEmpty()) {
             Image frontImage = this.imageService.saveImageInCloud(clothDto.getFrontImage(), cloth, "F");
             imagesToSave.add(frontImage);

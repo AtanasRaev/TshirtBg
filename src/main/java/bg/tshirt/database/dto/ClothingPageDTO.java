@@ -4,7 +4,7 @@ import bg.tshirt.database.entity.enums.Type;
 
 import java.util.List;
 
-public class ClothPageDTO {
+public class ClothingPageDTO {
    private Long id;
 
    private String name;

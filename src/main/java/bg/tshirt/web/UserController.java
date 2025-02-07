@@ -70,7 +70,7 @@ public class UserController {
                 jwtTokenProvider.getExpirationDate(refreshToken)
         );
 
-        return ResponseEntity.ok(new UserResponseDTO("success", "Registration successful", accessToken, refreshToken));
+        return ResponseEntity.ok(new UserResponseDTO("success", "Registration successful", accessToken, refreshToken, this.userService.getUserRoles(accessToken)));
     }
 
     @PostMapping("/login")
@@ -93,6 +93,6 @@ public class UserController {
                 jwtTokenProvider.getExpirationDate(refreshToken)
         );
 
-        return ResponseEntity.ok(new UserResponseDTO("success", "Login successful", accessToken, refreshToken));
+        return ResponseEntity.ok(new UserResponseDTO("success", "Login successful", accessToken, refreshToken, this.userService.getUserRoles(accessToken)));
     }
 }

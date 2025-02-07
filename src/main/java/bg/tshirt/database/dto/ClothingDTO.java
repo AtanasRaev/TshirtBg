@@ -3,38 +3,32 @@ package bg.tshirt.database.dto;
 import bg.tshirt.database.entity.enums.Category;
 import bg.tshirt.database.entity.enums.Gender;
 import bg.tshirt.database.entity.enums.Type;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
-public class ClothDetailsPageDTO {
-    private long id;
-
+public class ClothingDTO {
+    @NotBlank(message = "Name cannot be blank.")
     private String name;
 
+    @NotBlank(message = "Description cannot be blank.")
     private String description;
 
-    private double price;
-
-    private String model;
-
+    @NotNull(message = "Type cannot be null.")
     private Type type;
 
+    @NotNull(message = "Gender cannot be null.")
     private Gender gender;
 
+    @NotNull(message = "Category cannot be null.")
     private Category category;
 
-    private List<ImagePageDTO> images;
+    @NotBlank(message = "Model cannot be blank.")
+    private String model;
 
-    public ClothDetailsPageDTO() {
-    }
+    private MultipartFile frontImage;
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
+    private MultipartFile backImage;
 
     public String getName() {
         return name;
@@ -50,22 +44,6 @@ public class ClothDetailsPageDTO {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
     }
 
     public Type getType() {
@@ -92,11 +70,27 @@ public class ClothDetailsPageDTO {
         this.category = category;
     }
 
-    public List<ImagePageDTO> getImages() {
-        return images;
+    public String getModel() {
+        return model;
     }
 
-    public void setImages(List<ImagePageDTO> images) {
-        this.images = images;
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public MultipartFile getFrontImage() {
+        return frontImage;
+    }
+
+    public void setFrontImage(MultipartFile frontImage) {
+        this.frontImage = frontImage;
+    }
+
+    public MultipartFile getBackImage() {
+        return backImage;
+    }
+
+    public void setBackImage(MultipartFile backImage) {
+        this.backImage = backImage;
     }
 }

@@ -99,6 +99,11 @@ public class UserServiceImpl implements UserService {
                 .orElse(null);
     }
 
+    @Override
+    public List<String> getUserRoles(String accessToken) {
+        return this.jwtTokenProvider.getRoles(accessToken);
+    }
+
     private UserProfileDTO mapToUserProfileDTO(User user) {
         UserProfileDTO userProfileDTO = modelMapper.map(user, UserProfileDTO.class);
         List<OrderPageDTO> sortedOrders = userProfileDTO.getOrders().stream()

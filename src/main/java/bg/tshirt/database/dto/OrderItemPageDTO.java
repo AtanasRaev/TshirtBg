@@ -3,7 +3,7 @@ package bg.tshirt.database.dto;
 public class OrderItemPageDTO {
     private Long id;
 
-    private ClothPageDTO cloth;
+    private ClothingPageDTO cloth;
 
     private int quantity;
 
@@ -15,11 +15,11 @@ public class OrderItemPageDTO {
         this.id = id;
     }
 
-    public ClothPageDTO getCloth() {
+    public ClothingPageDTO getCloth() {
         return cloth;
     }
 
-    public void setCloth(ClothPageDTO cloth) {
+    public void setCloth(ClothingPageDTO cloth) {
         this.cloth = cloth;
     }
 

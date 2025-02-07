@@ -1,6 +1,9 @@
 package bg.tshirt.database.dto;
 
+import bg.tshirt.database.entity.enums.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 public class UserResponseDTO {
     private String status;
@@ -11,11 +14,14 @@ public class UserResponseDTO {
 
     private String refreshToken;
 
-    public UserResponseDTO(String status, String message, String token, String refreshToken) {
+    private List<String> roles;
+
+    public UserResponseDTO(String status, String message, String token, String refreshToken, List<String> roles) {
         this.status = status;
         this.message = message;
         this.accessToken = token;
         this.refreshToken = refreshToken;
+        this.roles = roles;
     }
 
     public String getStatus() {
@@ -48,5 +54,14 @@ public class UserResponseDTO {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 }

@@ -11,7 +11,7 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cloth_id", referencedColumnName = "id")
-    private Cloth cloth;
+    private Clothing cloth;
 
     @Column
     private int quantity;
@@ -47,11 +47,11 @@ public class OrderItem {
         this.price = price;
     }
 
-    public Cloth getCloth() {
+    public Clothing getCloth() {
         return cloth;
     }
 
-    public void setCloth(Cloth cloth) {
+    public void setCloth(Clothing cloth) {
         this.cloth = cloth;
     }
 

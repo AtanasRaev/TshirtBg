@@ -37,23 +37,19 @@ public class SecurityConfig {
                 })
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/clothes/**").permitAll()
                             .requestMatchers(
                                     "/users/login",
                                     "/users/register",
-                                    "/clothes/details/**",
-                                    "/clothes/search",
-                                    "/clothes/category",
-                                    "/clothes/type",
                                     "/orders/create",
                                     "/refresh-token",
-                                    "/clothes/newest",
-                                    "/clothes/most-sold",
                                     "/ping"
                             ).permitAll()
+                            .requestMatchers(HttpMethod.PUT, "/clothes/**").authenticated()
+                            .requestMatchers(HttpMethod.DELETE, "/clothes/**").authenticated()
                             .requestMatchers(
                                     "/users/profile",
                                     "/clothes/add",
-                                    "/clothes/edit/**",
                                     "/orders/list"
                             ).authenticated()
                             .anyRequest().authenticated();

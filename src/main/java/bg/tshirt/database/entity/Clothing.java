@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "clothes")
-public class Cloth {
+public class Clothing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -44,11 +44,10 @@ public class Cloth {
 
     @OneToMany(mappedBy = "cloth",
             fetch = FetchType.EAGER,
-            cascade = {CascadeType.REMOVE},
             orphanRemoval = true)
     private List<Image> images;
 
-    public Cloth(String name, String description, double price, String model, Type type, Gender gender, Category category) {
+    public Clothing(String name, String description, double price, String model, Type type, Gender gender, Category category) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -59,7 +58,7 @@ public class Cloth {
         this.category = category;
     }
 
-    public Cloth() {
+    public Clothing() {
     }
 
     public String getPageModel(){

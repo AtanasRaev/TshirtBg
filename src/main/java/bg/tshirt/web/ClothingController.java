@@ -1,9 +1,8 @@
 package bg.tshirt.web;
 
 import bg.tshirt.database.dto.*;
-import bg.tshirt.database.entity.enums.Type;
 import bg.tshirt.exceptions.NotFoundException;
-import bg.tshirt.service.ClothService;
+import bg.tshirt.service.ClothingService;
 import bg.tshirt.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -22,17 +21,17 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/clothes")
-public class ClothController {
+public class ClothingController {
     private final UserService userService;
-    private final ClothService clothService;
+    private final ClothingService clothService;
 
-    public ClothController(UserService userService, ClothService clothService) {
+    public ClothingController(UserService userService, ClothingService clothService) {
         this.userService = userService;
         this.clothService = clothService;
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addCloth(@ModelAttribute @Valid ClothDTO clothDTO, HttpServletRequest request) {
+    public ResponseEntity<?> addCloth(@ModelAttribute @Valid ClothingDTO clothDTO, HttpServletRequest request) {
         UserDTO admin = this.userService.validateAdmin(request);
 
         if (!this.clothService.addCloth(clothDTO)) {
@@ -56,7 +55,7 @@ public class ClothController {
                     "message", "Id must be a positive number"
             ));
         }
-        ClothDetailsPageDTO dto = this.clothService.findById(id);
+        ClothingDetailsPageDTO dto = this.clothService.findById(id);
 
         if (dto == null) {
             throw new NotFoundException("Cloth not found in the system.");
@@ -140,7 +139,7 @@ public class ClothController {
                                                @RequestParam(defaultValue = "1") @Min(1) int page) {
 
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("saleCount"));
-        Page<ClothPageDTO> clothPage = getMostSoldClothes(pageable, type, category);
+        Page<ClothingPageDTO> clothPage = getMostSoldClothes(pageable, type, category);
 
 
         return buildPagedResponse(clothPage);
@@ -153,12 +152,12 @@ public class ClothController {
 
 
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
-        Page<ClothPageDTO> clothPage = getNewestClothes(pageable, type);
+        Page<ClothingPageDTO> clothPage = getNewestClothes(pageable, type);
 
         return buildPagedResponse(clothPage);
     }
 
-    private Page<ClothPageDTO> getMostSoldClothes(Pageable pageable, String type, String category) {
+    private Page<ClothingPageDTO> getMostSoldClothes(Pageable pageable, String type, String category) {
         if (StringUtils.hasText(type) && StringUtils.hasText(category)) {
             return this.clothService.findByTypeAndCategory(pageable, type, category);
         } else if (StringUtils.hasText(type)) {
@@ -170,7 +169,7 @@ public class ClothController {
         }
     }
 
-    private Page<ClothPageDTO> getNewestClothes(Pageable pageable, String type) {
+    private Page<ClothingPageDTO> getNewestClothes(Pageable pageable, String type) {
         return StringUtils.hasText(type)
                 ? clothService.getNewest(pageable, type)
                 : clothService.getNewest(pageable);

@@ -6,6 +6,8 @@ import bg.tshirt.database.dto.UserRegistrationDTO;
 import bg.tshirt.database.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
+
 public interface UserService {
     void registerUser(UserRegistrationDTO registrationDTO);
 
@@ -18,4 +20,6 @@ public interface UserService {
     void saveUser(User user);
 
     UserProfileDTO getUserProfile(HttpServletRequest request);
+
+    List<String> getUserRoles(String accessToken);
 }

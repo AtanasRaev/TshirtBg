@@ -1,5 +1,6 @@
 package bg.tshirt.config;
 
+import bg.tshirt.database.entity.enums.Role;
 import bg.tshirt.service.RefreshTokenService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -92,6 +93,11 @@ public class JwtTokenProvider {
     public Instant getExpirationDate(String token) {
         Claims claims = parseToken(token);
         return claims.getExpiration().toInstant();
+    }
+
+    public List<String> getRoles(String token) {
+        Claims claims = parseToken(token);
+        return claims.get("roles", List.class);
     }
 
     public boolean validateToken(String token, String currentFingerprint) {

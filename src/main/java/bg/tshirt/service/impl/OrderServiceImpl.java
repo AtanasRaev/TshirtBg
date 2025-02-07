@@ -1,16 +1,16 @@
 package bg.tshirt.service.impl;
 
 import bg.tshirt.database.dto.*;
-import bg.tshirt.database.entity.Cloth;
+import bg.tshirt.database.entity.Clothing;
 import bg.tshirt.database.entity.Order;
 import bg.tshirt.database.entity.OrderItem;
 import bg.tshirt.database.entity.User;
-import bg.tshirt.database.repository.ClothRepository;
+import bg.tshirt.database.repository.ClothingRepository;
 import bg.tshirt.database.repository.OrderRepository;
 import bg.tshirt.database.repository.UserRepository;
 import bg.tshirt.exceptions.BadRequestException;
 import bg.tshirt.exceptions.NotFoundException;
-import bg.tshirt.service.ClothService;
+import bg.tshirt.service.ClothingService;
 import bg.tshirt.service.OrderService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -27,15 +27,15 @@ import java.util.stream.Collectors;
 @Service
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
-    private final ClothRepository clothRepository;
+    private final ClothingRepository clothRepository;
     private final UserRepository userRepository;
-    private final ClothService clothService;
+    private final ClothingService clothService;
     private final ModelMapper modelMapper;
 
     public OrderServiceImpl(OrderRepository orderRepository,
-                            ClothRepository clothRepository,
+                            ClothingRepository clothRepository,
                             UserRepository userRepository,
-                            ClothService clothService,
+                            ClothingService clothService,
                             ModelMapper modelMapper) {
         this.orderRepository = orderRepository;
         this.clothRepository = clothRepository;
@@ -143,14 +143,14 @@ public class OrderServiceImpl implements OrderService {
                 .map(OrderItemDTO::getClothId)
                 .toList();
 
-        Map<Long, Cloth> clothMap = this.clothRepository.findAllById(clothIds)
+        Map<Long, Clothing> clothMap = this.clothRepository.findAllById(clothIds)
                 .stream()
-                .collect(Collectors.toMap(Cloth::getId, Function.identity()));
+                .collect(Collectors.toMap(Clothing::getId, Function.identity()));
 
         return orderDTO.getItems()
                 .stream()
                 .map(itemDTO -> {
-                    Cloth cloth = clothMap.get(itemDTO.getClothId());
+                    Clothing cloth = clothMap.get(itemDTO.getClothId());
                     if (cloth == null) {
                         throw new NotFoundException("Cloth with id: " + itemDTO.getClothId() + " not found");
                     }

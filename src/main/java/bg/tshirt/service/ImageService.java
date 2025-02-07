@@ -1,24 +1,24 @@
 package bg.tshirt.service;
 
-import bg.tshirt.database.dto.ClothDTO;
-import bg.tshirt.database.entity.Cloth;
+import bg.tshirt.database.dto.ClothingDTO;
+import bg.tshirt.database.entity.Clothing;
 import bg.tshirt.database.entity.Image;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface ImageService {
-    Image uploadImage(MultipartFile multipartFile, String publicId, Cloth cloth);
+    Image uploadImage(MultipartFile multipartFile, String publicId, Clothing cloth);
 
     void saveAll(List<Image> extractedImages);
 
     void deleteAll(List<String> publicIds);
 
-    Image saveImageInCloud(MultipartFile file, Cloth cloth, String side);
+    Image saveImageInCloud(MultipartFile file, Clothing cloth, String side);
 
     Image findByPublicIds(String publicId);
 
-    List<Image> saveImagesInCloud(ClothDTO clothDTO, Cloth cloth);
+    List<Image> saveImagesInCloud(ClothingDTO clothDTO, Clothing cloth);
 
     Image findByPath(String path);
 

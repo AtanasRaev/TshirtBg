@@ -17,12 +17,12 @@ public class Image {
 
     @ManyToOne
     @JoinColumn(name = "cloth_id", referencedColumnName = "id")
-    private Cloth cloth;
+    private Clothing cloth;
 
     public Image() {
     }
 
-    public Image(String path, String publicId, Cloth cloth) {
+    public Image(String path, String publicId, Clothing cloth) {
         this.path = path;
         this.publicId = publicId;
         this.cloth = cloth;
@@ -52,11 +52,11 @@ public class Image {
         this.publicId = publicId;
     }
 
-    public Cloth getCloth() {
+    public Clothing getCloth() {
         return cloth;
     }
 
-    public void setCloth(Cloth cloth) {
+    public void setCloth(Clothing cloth) {
         this.cloth = cloth;
     }
 }
