@@ -47,7 +47,7 @@ public class ClothingServiceImpl implements ClothingService {
         Clothing cloth = new Clothing(clothDTO.getName(),
                 clothDTO.getDescription(),
                 setPrice(clothDTO.getType()),
-                clothDTO.getModel(),
+                clothDTO.getModel() + getModelType(clothDTO.getType()),
                 clothDTO.getType(),
                 clothDTO.getGender(),
                 clothDTO.getCategory());
@@ -181,7 +181,7 @@ public class ClothingServiceImpl implements ClothingService {
         cloth.setName(clothDto.getName());
         cloth.setDescription(clothDto.getDescription());
         cloth.setPrice(setPrice(clothDto.getType()));
-        cloth.setModel(clothDto.getModel());
+        cloth.setModel(clothDto.getModel() + getModelType(clothDto.getType()));
         cloth.setType(clothDto.getType());
         cloth.setGender(clothDto.getGender());
         cloth.setCategory(clothDto.getCategory());
@@ -220,6 +220,26 @@ public class ClothingServiceImpl implements ClothingService {
                 this.imageService.deleteImage(image);
             }
         });
+    }
+
+    private String getModelType(Type type) {
+        switch (type) {
+            case SHORTS -> {
+                return "K";
+            }
+            case SWEATSHIRT -> {
+                return "SW";
+            }
+            case LONG_T_SHIRT -> {
+                return "D";
+            }
+            case KIT -> {
+                return "KT";
+            }
+            default -> {
+                return "";
+            }
+        }
     }
 
     private void addNewImages(ClothingDTO clothDto, Clothing cloth, List<Image> imagesToSave) {

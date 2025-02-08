@@ -47,6 +47,7 @@ public class SecurityConfig {
                             ).permitAll()
                             .requestMatchers(HttpMethod.PUT, "/clothes/**").authenticated()
                             .requestMatchers(HttpMethod.DELETE, "/clothes/**").authenticated()
+                            .requestMatchers(HttpMethod.POST, "/clothes/**").authenticated()
                             .requestMatchers(
                                     "/users/profile",
                                     "/clothes/add",

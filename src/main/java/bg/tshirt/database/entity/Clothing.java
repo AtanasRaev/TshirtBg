@@ -62,15 +62,6 @@ public class Clothing {
     }
 
     public String getPageModel(){
-        String type = "";
-
-        switch (getType()) {
-            case SHORTS -> type = "K";
-            case SWEATSHIRT -> type = "SW";
-            case LONG_T_SHIRT -> type = "D";
-            case KIT -> type = "KT";
-        }
-
         String gender = "";
 
         switch (getGender()) {
@@ -79,7 +70,7 @@ public class Clothing {
             case CHILD -> gender = "C";
         }
 
-        return String.format("%s%s_%s", getModel(), type, gender);
+        return String.format("%s_%s", getModel(),gender);
     }
 
     public long getId() {
