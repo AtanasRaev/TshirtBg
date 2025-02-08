@@ -8,11 +8,11 @@ import bg.tshirt.database.dto.UserRegistrationDTO;
 import bg.tshirt.database.entity.User;
 import bg.tshirt.database.entity.enums.Role;
 import bg.tshirt.database.repository.UserRepository;
-import bg.tshirt.exceptions.EmailAlreadyInUseException;
-import bg.tshirt.exceptions.ForbiddenException;
-import bg.tshirt.exceptions.NotFoundException;
-import bg.tshirt.exceptions.UnauthorizedException;
+import bg.tshirt.exceptions.*;
 import bg.tshirt.service.UserService;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -29,16 +29,19 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final PhoneNumberUtil phoneNumberUtil;
     private final ModelMapper modelMapper;
     private final static int ADMINS_COUNT = 2;
 
     public UserServiceImpl(UserRepository userRepository,
                            JwtTokenProvider jwtTokenProvider,
                            PasswordEncoder passwordEncoder,
+                           PhoneNumberUtil phoneNumberUtil,
                            ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
+        this.phoneNumberUtil = phoneNumberUtil;
         this.modelMapper = modelMapper;
     }
 
@@ -48,6 +51,8 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(registrationDTO.getEmail())) {
             throw new EmailAlreadyInUseException("Email is already in use");
         }
+
+        validateBulgarianPhoneNumber(registrationDTO.getPhoneNumber());
 
         Set<Role> roles = determineRoles();
 
@@ -111,6 +116,17 @@ public class UserServiceImpl implements UserService {
                 .toList();
         userProfileDTO.setOrders(sortedOrders);
         return userProfileDTO;
+    }
+
+    public void validateBulgarianPhoneNumber(String phone) {
+        try {
+            Phonenumber.PhoneNumber phoneNumber = phoneNumberUtil.parse(phone, "BG");
+            if (!phoneNumberUtil.isValidNumber(phoneNumber)) {
+                throw new InvalidPhoneNumberException("Invalid Bulgarian phone number: " + phone);
+            }
+        } catch (NumberParseException e) {
+            throw new InvalidPhoneNumberException("Invalid phone number format: " + phone);
+        }
     }
 
     private void validateAdminRole(String token) {
