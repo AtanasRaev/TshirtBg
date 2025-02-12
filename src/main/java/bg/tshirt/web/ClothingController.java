@@ -150,11 +150,25 @@ public class ClothingController {
     }
 
     private Pageable getPageable(int page, int size, String sort) {
-        return PageRequest.of(page - 1, size, Sort.by(determineSort(sort)).descending());
-    }
+        Sort.Direction direction = Sort.Direction.ASC;
+        String sortBy;
 
-    private String determineSort(String sort) {
-        return "most-sold".equals(sort) ? "saleCount" : "id";
+        switch (sort) {
+            case "most-sold" -> sortBy = "saleCount";
+            case "new" -> sortBy = "id";
+            case "price_desc" -> {
+                sortBy = "price";
+                direction = Sort.Direction.DESC;
+            }
+            case "price_asc" -> sortBy = "price";
+            case "name_desc" -> {
+                sortBy = "name";
+                direction = Sort.Direction.DESC;
+            }
+            default -> sortBy = "name";
+        }
+
+        return PageRequest.of(page - 1, size, Sort.by(direction, sortBy));
     }
 
     private Page<ClothingPageDTO> getClothesPage(Pageable pageable, String type, String category) {
