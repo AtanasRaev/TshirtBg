@@ -35,7 +35,7 @@ public interface ClothingService {
 
     Page<ClothingPageDTO> getNewestByTypeAndCategory(Pageable pageable, String type, String category);
 
-    Page<ClothingPageDTO> getMostSold(Pageable pageable);
+    Page<ClothingPageDTO> getAllPage(Pageable pageable);
 
     boolean delete(Long id);
 }

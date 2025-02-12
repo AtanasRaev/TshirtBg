@@ -161,7 +161,7 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
-    public Page<ClothingPageDTO> getMostSold(Pageable pageable) {
+    public Page<ClothingPageDTO> getAllPage(Pageable pageable) {
         return this.clothRepository.findAllPage(pageable)
                 .map(cloth -> this.modelMapper.map(cloth, ClothingPageDTO.class));
     }

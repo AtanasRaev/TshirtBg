@@ -144,21 +144,9 @@ public class ClothingController {
                                         @RequestParam(defaultValue = "1") @Min(1) int page) {
 
         Pageable pageable = getPageable(page, size, sort);
-        Page<ClothingPageDTO> clothPage = getClothesPage(pageable, type, sort, category);
+        Page<ClothingPageDTO> clothPage = getClothesPage(pageable, type, category);
 
         return buildPagedResponse(clothPage);
-    }
-
-    private Page<ClothingPageDTO> getClothesPage(Pageable pageable, String type, String sort, String category) {
-        Page<ClothingPageDTO> page;
-
-        if (sort.equals("most-sold")) {
-            page = getMostSoldClothes(pageable, type, category);
-        } else {
-            page = getNewestClothes(pageable, type, category);
-        }
-
-        return page;
     }
 
     private Pageable getPageable(int page, int size, String sort) {
@@ -169,7 +157,7 @@ public class ClothingController {
         return "most-sold".equals(sort) ? "saleCount" : "id";
     }
 
-    private Page<ClothingPageDTO> getMostSoldClothes(Pageable pageable, String type, String category) {
+    private Page<ClothingPageDTO> getClothesPage(Pageable pageable, String type, String category) {
         if (StringUtils.hasText(type) && StringUtils.hasText(category)) {
             return this.clothService.findByTypeAndCategory(pageable, type, category);
         } else if (StringUtils.hasText(type)) {
@@ -177,19 +165,7 @@ public class ClothingController {
         } else if (StringUtils.hasText(category)) {
             return this.clothService.findByCategory(pageable, category);
         } else {
-            return this.clothService.getMostSold(pageable);
-        }
-    }
-
-    private Page<ClothingPageDTO> getNewestClothes(Pageable pageable, String type, String category) {
-        if (StringUtils.hasText(type) && StringUtils.hasText(category)) {
-            return this.clothService.getNewestByTypeAndCategory(pageable, type, category);
-        } else if (StringUtils.hasText(type)) {
-            return this.clothService.getNewestByType(pageable, type);
-        } else if (StringUtils.hasText(category)) {
-            return this.clothService.getNewestByCategory(pageable, category);
-        } else {
-            return this.clothService.getNewest(pageable);
+            return this.clothService.getAllPage(pageable);
         }
     }
 
