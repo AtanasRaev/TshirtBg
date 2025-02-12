@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.Date;
 
 public interface RefreshTokenService {
-    RefreshToken saveNewToken(String tokenId, String userEmail, Instant expiryDate);
+    void saveNewToken(String tokenId, String userEmail, Instant expiryDate);
 
     boolean isValid(String tokenId);
 

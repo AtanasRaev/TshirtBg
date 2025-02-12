@@ -31,7 +31,8 @@ public class ClothingController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addCloth(@ModelAttribute @Valid ClothingDTO clothDTO, HttpServletRequest request) {
+    public ResponseEntity<?> addCloth(@ModelAttribute @Valid ClothingDTO clothDTO,
+                                      HttpServletRequest request) {
         UserDTO admin = this.userService.validateAdmin(request);
 
         if (!this.clothService.addCloth(clothDTO)) {
@@ -68,7 +69,9 @@ public class ClothingController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editClothById(@PathVariable("id") Long id, @ModelAttribute @Valid ClothEditDTO clothDto, HttpServletRequest request) {
+    public ResponseEntity<?> editClothById(@PathVariable("id") Long id,
+                                           @ModelAttribute @Valid ClothEditDTO clothDto,
+                                           HttpServletRequest request) {
         //TODO: Think about changing the model of a cloth for the public id
         if (id == null || id < 1) {
             return ResponseEntity.badRequest().body(Map.of(
@@ -92,7 +95,8 @@ public class ClothingController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteClothById(@PathVariable("id") Long id, HttpServletRequest request) {
+    public ResponseEntity<?> deleteClothById(@PathVariable("id") Long id,
+                                             HttpServletRequest request) {
         if (id == null || id < 1) {
             return ResponseEntity.badRequest().body(Map.of(
                     "status", "error",
@@ -127,34 +131,42 @@ public class ClothingController {
         }
 
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<?> clothPage = this.clothService.findByQuery(pageable, name);
+        Page<ClothingPageDTO> clothPage = this.clothService.findByQuery(pageable, name);
 
         return buildPagedResponse(clothPage);
     }
 
-    @GetMapping("/most-sold")
-    public ResponseEntity<?> searchByMostSoled(@RequestParam(required = false) String type,
-                                               @RequestParam(required = false) String category,
-                                               @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
-                                               @RequestParam(defaultValue = "1") @Min(1) int page) {
+    @GetMapping("/catalog")
+    public ResponseEntity<?> getCatalog(@RequestParam(defaultValue = "most-sold") String sort,
+                                        @RequestParam(required = false) String type,
+                                        @RequestParam(required = false) String category,
+                                        @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
+                                        @RequestParam(defaultValue = "1") @Min(1) int page) {
 
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("saleCount"));
-        Page<ClothingPageDTO> clothPage = getMostSoldClothes(pageable, type, category);
-
+        Pageable pageable = getPageable(page, size, sort);
+        Page<ClothingPageDTO> clothPage = getClothesPage(pageable, type, sort, category);
 
         return buildPagedResponse(clothPage);
     }
 
-    @GetMapping("/newest")
-    public ResponseEntity<?> getNewestCloth(@RequestParam(required = false) String type,
-                                            @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
-                                            @RequestParam(defaultValue = "1") @Min(1) int page) {
+    private Page<ClothingPageDTO> getClothesPage(Pageable pageable, String type, String sort, String category) {
+        Page<ClothingPageDTO> page;
 
+        if (sort.equals("most-sold")) {
+            page = getMostSoldClothes(pageable, type, category);
+        } else {
+            page = getNewestClothes(pageable, type, category);
+        }
 
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
-        Page<ClothingPageDTO> clothPage = getNewestClothes(pageable, type);
+        return page;
+    }
 
-        return buildPagedResponse(clothPage);
+    private Pageable getPageable(int page, int size, String sort) {
+        return PageRequest.of(page - 1, size, Sort.by(determineSort(sort)).descending());
+    }
+
+    private String determineSort(String sort) {
+        return "most-sold".equals(sort) ? "saleCount" : "id";
     }
 
     private Page<ClothingPageDTO> getMostSoldClothes(Pageable pageable, String type, String category) {
@@ -169,16 +181,16 @@ public class ClothingController {
         }
     }
 
-    private Page<ClothingPageDTO> getNewestClothes(Pageable pageable, String type) {
-        return StringUtils.hasText(type)
-                ? clothService.getNewest(pageable, type)
-                : clothService.getNewest(pageable);
-    }
-
-    private Pageable createPageable(int page, int size, String sort) {
-        Sort.Direction direction = sort.equals("priceAsc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-        String sortProperty = sort.equals("saleCount") ? "sa0leCount" : "price";
-        return PageRequest.of(page - 1, size, Sort.by(direction, sortProperty));
+    private Page<ClothingPageDTO> getNewestClothes(Pageable pageable, String type, String category) {
+        if (StringUtils.hasText(type) && StringUtils.hasText(category)) {
+            return this.clothService.getNewestByTypeAndCategory(pageable, type, category);
+        } else if (StringUtils.hasText(type)) {
+            return this.clothService.getNewestByType(pageable, type);
+        } else if (StringUtils.hasText(category)) {
+            return this.clothService.getNewestByCategory(pageable, category);
+        } else {
+            return this.clothService.getNewest(pageable);
+        }
     }
 
     private ResponseEntity<?> buildPagedResponse(Page<?> clothPage) {

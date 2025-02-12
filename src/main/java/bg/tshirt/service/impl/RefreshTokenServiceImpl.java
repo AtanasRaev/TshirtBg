@@ -17,13 +17,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
-    public RefreshToken saveNewToken(String tokenId, String userEmail, Instant expiryDate) {
+    public void saveNewToken(String tokenId, String userEmail, Instant expiryDate) {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setTokenId(tokenId);
         refreshToken.setUserEmail(userEmail);
         refreshToken.setExpiryDate(expiryDate);
         refreshToken.setRevoked(false);
-        return refreshTokenRepository.save(refreshToken);
+        refreshTokenRepository.save(refreshToken);
     }
 
     @Override

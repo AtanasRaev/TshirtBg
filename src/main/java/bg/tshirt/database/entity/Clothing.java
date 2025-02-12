@@ -33,10 +33,6 @@ public class Clothing {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private Gender gender;
-
-    @Column
-    @Enumerated(EnumType.STRING)
     private Category category;
 
     @Column(nullable = false)
@@ -47,30 +43,17 @@ public class Clothing {
             orphanRemoval = true)
     private List<Image> images;
 
-    public Clothing(String name, String description, double price, String model, Type type, Gender gender, Category category) {
+    public Clothing(String name, String description, double price, String model, Type type, Category category) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.model = model;
         this.type = type;
-        this.gender = gender;
         this.images = new ArrayList<>();
         this.category = category;
     }
 
     public Clothing() {
-    }
-
-    public String getPageModel(){
-        String gender = "";
-
-        switch (getGender()) {
-            case MALE -> gender = "M";
-            case FEMALE -> gender = "F";
-            case CHILD -> gender = "C";
-        }
-
-        return String.format("%s_%s", getModel(),gender);
     }
 
     public long getId() {
@@ -119,14 +102,6 @@ public class Clothing {
 
     public void setType(Type type) {
         this.type = type;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
     }
 
     public List<Image> getImages() {

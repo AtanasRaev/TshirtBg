@@ -1,6 +1,5 @@
 package bg.tshirt.config;
 
-import bg.tshirt.database.entity.enums.Role;
 import bg.tshirt.service.RefreshTokenService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

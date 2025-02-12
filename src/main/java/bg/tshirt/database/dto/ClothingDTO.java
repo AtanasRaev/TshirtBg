@@ -1,7 +1,6 @@
 package bg.tshirt.database.dto;
 
 import bg.tshirt.database.entity.enums.Category;
-import bg.tshirt.database.entity.enums.Gender;
 import bg.tshirt.database.entity.enums.Type;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,9 +15,6 @@ public class ClothingDTO {
 
     @NotNull(message = "Type cannot be null.")
     private Type type;
-
-    @NotNull(message = "Gender cannot be null.")
-    private Gender gender;
 
     @NotNull(message = "Category cannot be null.")
     private Category category;
@@ -52,14 +48,6 @@ public class ClothingDTO {
 
     public void setType(Type type) {
         this.type = type;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
     }
 
     public Category getCategory() {

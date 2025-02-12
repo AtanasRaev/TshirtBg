@@ -29,7 +29,11 @@ public interface ClothingService {
 
     Page<ClothingPageDTO> getNewest(Pageable pageable);
 
-    Page<ClothingPageDTO> getNewest(Pageable pageable, String type);
+    Page<ClothingPageDTO> getNewestByType(Pageable pageable, String type);
+
+    Page<ClothingPageDTO> getNewestByCategory(Pageable pageable, String category);
+
+    Page<ClothingPageDTO> getNewestByTypeAndCategory(Pageable pageable, String type, String category);
 
     Page<ClothingPageDTO> getMostSold(Pageable pageable);
 

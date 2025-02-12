@@ -1,9 +1,6 @@
 package bg.tshirt.service.impl;
 
-import bg.tshirt.database.dto.ClothingDTO;
-import bg.tshirt.database.dto.ClothEditDTO;
-import bg.tshirt.database.dto.ClothingDetailsPageDTO;
-import bg.tshirt.database.dto.ClothingPageDTO;
+import bg.tshirt.database.dto.*;
 import bg.tshirt.database.entity.Clothing;
 import bg.tshirt.database.entity.Image;
 import bg.tshirt.database.entity.OrderItem;
@@ -38,7 +35,7 @@ public class ClothingServiceImpl implements ClothingService {
 
     @Override
     public boolean addCloth(ClothingDTO clothDTO) {
-        Optional<Clothing> optional = this.clothRepository.findByModelAndTypeAndGender(clothDTO.getModel(), clothDTO.getType(), clothDTO.getGender());
+        Optional<Clothing> optional = this.clothRepository.findByModelAndType(clothDTO.getModel(), clothDTO.getType());
 
         if (optional.isPresent()) {
             return false;
@@ -49,7 +46,6 @@ public class ClothingServiceImpl implements ClothingService {
                 setPrice(clothDTO.getType()),
                 clothDTO.getModel() + getModelType(clothDTO.getType()),
                 clothDTO.getType(),
-                clothDTO.getGender(),
                 clothDTO.getCategory());
 
         List<Image> images = new ArrayList<>();
@@ -63,9 +59,26 @@ public class ClothingServiceImpl implements ClothingService {
 
     @Override
     public ClothingDetailsPageDTO findById(Long id) {
-        return this.clothRepository.findById(id)
-                .map(cloth -> this.modelMapper.map(cloth, ClothingDetailsPageDTO.class))
-                .orElse(null);
+        Optional<ClothingDetailsPageDTO> optional = this.clothRepository.findById(id)
+                .map(cloth -> this.modelMapper.map(cloth, ClothingDetailsPageDTO.class));
+
+        if (optional.isEmpty()) {
+            return null;
+        }
+
+        ClothingDetailsPageDTO clothing = optional.get();
+
+        if (clothing.getType() != Type.KIT) {
+            return clothing;
+        }
+
+        String modelTshirt = clothing.getModel().substring(0, clothing.getModel().length() - 2);
+        String modelShorts = clothing.getModel().substring(0, clothing.getModel().length() - 1);
+
+        addImagesToKit(clothing, modelTshirt);
+        addImagesToKit(clothing, modelShorts);
+
+        return clothing;
     }
 
     @Override
@@ -114,25 +127,42 @@ public class ClothingServiceImpl implements ClothingService {
 
     @Override
     public void setTotalSales(List<OrderItem> items, String newStatus, String oldStatus) {
-        List<Clothing> allById = this.clothRepository.findAllById(items.stream().mapToLong(item -> item.getCloth().getId()).boxed().toList());
+        List<Clothing> allById = this.clothRepository.findAllById(items
+                .stream()
+                .mapToLong(item -> item.getCloth().getId())
+                .boxed()
+                .toList());
+
         allById.forEach(Clothing::updateTotalSales);
     }
 
     @Override
     public Page<ClothingPageDTO> getNewest(Pageable pageable) {
-        return this.clothRepository.findAllDesc(pageable)
+        return this.clothRepository.findAllPage(pageable)
                 .map(cloth -> this.modelMapper.map(cloth, ClothingPageDTO.class));
     }
 
     @Override
-    public Page<ClothingPageDTO> getNewest(Pageable pageable, String type) {
-        return this.clothRepository.findAllWithTypeDesc(pageable, type)
+    public Page<ClothingPageDTO> getNewestByType(Pageable pageable, String type) {
+        return this.clothRepository.findByType(pageable, type)
+                .map(cloth -> this.modelMapper.map(cloth, ClothingPageDTO.class));
+    }
+
+    @Override
+    public Page<ClothingPageDTO> getNewestByCategory(Pageable pageable, String category) {
+        return this.clothRepository.findByCategory(pageable, category)
+                .map(cloth -> this.modelMapper.map(cloth, ClothingPageDTO.class));
+    }
+
+    @Override
+    public Page<ClothingPageDTO> getNewestByTypeAndCategory(Pageable pageable, String type, String category) {
+        return this.clothRepository.findByTypeAndCategory(pageable, type, category)
                 .map(cloth -> this.modelMapper.map(cloth, ClothingPageDTO.class));
     }
 
     @Override
     public Page<ClothingPageDTO> getMostSold(Pageable pageable) {
-        return this.clothRepository.findAllOrderBySaleCount(pageable)
+        return this.clothRepository.findAllPage(pageable)
                 .map(cloth -> this.modelMapper.map(cloth, ClothingPageDTO.class));
     }
 
@@ -169,6 +199,37 @@ public class ClothingServiceImpl implements ClothingService {
         return price;
     }
 
+    private String getModelType(Type type) {
+        switch (type) {
+            case SHORTS -> {
+                return "K";
+            }
+            case SWEATSHIRT -> {
+                return "SW";
+            }
+            case LONG_T_SHIRT -> {
+                return "D";
+            }
+            case KIT -> {
+                return "KT";
+            }
+            default -> {
+                return "";
+            }
+        }
+    }
+
+    private void addImagesToKit(ClothingPageDTO clothing, String model) {
+        this.clothRepository.findByModel(model)
+                .ifPresent(foundClothing -> {
+                    List<ImagePageDTO> imageDTOs = foundClothing.getImages()
+                            .stream()
+                            .map(image -> this.modelMapper.map(image, ImagePageDTO.class))
+                            .toList();
+                    clothing.getImages().addAll(imageDTOs);
+                });
+    }
+
     private boolean isInvalidUpdate(ClothEditDTO clothDto, Clothing cloth) {
         boolean frontAndBackImagesEmpty = clothDto.getFrontImage() != null && clothDto.getFrontImage().isEmpty()
                 && clothDto.getBackImage() != null && clothDto.getBackImage().isEmpty();
@@ -183,7 +244,6 @@ public class ClothingServiceImpl implements ClothingService {
         cloth.setPrice(setPrice(clothDto.getType()));
         cloth.setModel(clothDto.getModel() + getModelType(clothDto.getType()));
         cloth.setType(clothDto.getType());
-        cloth.setGender(clothDto.getGender());
         cloth.setCategory(clothDto.getCategory());
     }
 
@@ -220,26 +280,6 @@ public class ClothingServiceImpl implements ClothingService {
                 this.imageService.deleteImage(image);
             }
         });
-    }
-
-    private String getModelType(Type type) {
-        switch (type) {
-            case SHORTS -> {
-                return "K";
-            }
-            case SWEATSHIRT -> {
-                return "SW";
-            }
-            case LONG_T_SHIRT -> {
-                return "D";
-            }
-            case KIT -> {
-                return "KT";
-            }
-            default -> {
-                return "";
-            }
-        }
     }
 
     private void addNewImages(ClothingDTO clothDto, Clothing cloth, List<Image> imagesToSave) {
