@@ -1,14 +1,16 @@
 package bg.tshirt.service;
 
+import bg.tshirt.database.dto.ClothEditDTO;
 import bg.tshirt.database.dto.ClothingDTO;
 import bg.tshirt.database.dto.ClothingDetailsPageDTO;
-import bg.tshirt.database.dto.ClothEditDTO;
 import bg.tshirt.database.dto.ClothingPageDTO;
 import bg.tshirt.database.entity.OrderItem;
+import bg.tshirt.database.entity.enums.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ClothingService {
     boolean addCloth(ClothingDTO clothAddDTO);
@@ -19,23 +21,17 @@ public interface ClothingService {
 
     Page<ClothingPageDTO> findByQuery(Pageable pageable, String query);
 
-    Page<ClothingPageDTO> findByCategory(Pageable pageable, String category);
+    Page<ClothingPageDTO> findByCategory(Pageable pageable, List<String> category);
 
     Page<ClothingPageDTO> findByType(Pageable pageable, String type);
 
-    Page<ClothingPageDTO> findByTypeAndCategory(Pageable pageable, String type, String category);
+    Page<ClothingPageDTO> findByTypeAndCategory(Pageable pageable, String type, List<String> category);
 
     void setTotalSales(List<OrderItem> items, String newStatus, String oldStatus);
-
-    Page<ClothingPageDTO> getNewest(Pageable pageable);
-
-    Page<ClothingPageDTO> getNewestByType(Pageable pageable, String type);
-
-    Page<ClothingPageDTO> getNewestByCategory(Pageable pageable, String category);
-
-    Page<ClothingPageDTO> getNewestByTypeAndCategory(Pageable pageable, String type, String category);
 
     Page<ClothingPageDTO> getAllPage(Pageable pageable);
 
     boolean delete(Long id);
+
+    Map<Category, Long> getClothingCountByCategories();
 }

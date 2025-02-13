@@ -1,6 +1,7 @@
 package bg.tshirt.web;
 
 import bg.tshirt.database.dto.*;
+import bg.tshirt.database.entity.enums.Category;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothingService;
 import bg.tshirt.service.UserService;
@@ -17,17 +18,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/clothes")
 public class ClothingController {
     private final UserService userService;
-    private final ClothingService clothService;
+    private final ClothingService clothingService;
 
     public ClothingController(UserService userService, ClothingService clothService) {
         this.userService = userService;
-        this.clothService = clothService;
+        this.clothingService = clothService;
     }
 
     @PostMapping("/add")
@@ -35,7 +37,7 @@ public class ClothingController {
                                       HttpServletRequest request) {
         UserDTO admin = this.userService.validateAdmin(request);
 
-        if (!this.clothService.addCloth(clothDTO)) {
+        if (!this.clothingService.addCloth(clothDTO)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("message", "Cloth with this model and type already exists."));
         }
@@ -56,7 +58,7 @@ public class ClothingController {
                     "message", "Id must be a positive number"
             ));
         }
-        ClothingDetailsPageDTO dto = this.clothService.findById(id);
+        ClothingDetailsPageDTO dto = this.clothingService.findById(id);
 
         if (dto == null) {
             throw new NotFoundException("Cloth not found in the system.");
@@ -81,7 +83,7 @@ public class ClothingController {
         }
         UserDTO admin = this.userService.validateAdmin(request);
 
-        if (!this.clothService.editCloth(clothDto, id)) {
+        if (!this.clothingService.editCloth(clothDto, id)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("message", String.format("Cloth with id: %d has no images", id)));
         }
@@ -106,7 +108,7 @@ public class ClothingController {
 
         UserDTO admin = this.userService.validateAdmin(request);
 
-        if (!this.clothService.delete(id)) {
+        if (!this.clothingService.delete(id)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("message", String.format("Cloth with id: %d was not found", id)));
         }
@@ -131,39 +133,45 @@ public class ClothingController {
         }
 
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<ClothingPageDTO> clothPage = this.clothService.findByQuery(pageable, name);
+        Page<ClothingPageDTO> clothesPage = this.clothingService.findByQuery(pageable, name);
 
-        return buildPagedResponse(clothPage);
+        return buildPagedResponse(clothesPage);
     }
 
     @GetMapping("/catalog")
     public ResponseEntity<?> getCatalog(@RequestParam(defaultValue = "most-sold") String sort,
                                         @RequestParam(required = false) String type,
-                                        @RequestParam(required = false) String category,
+                                        @RequestParam(required = false) List<String> category,
                                         @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
                                         @RequestParam(defaultValue = "1") @Min(1) int page) {
 
         Pageable pageable = getPageable(page, size, sort);
-        Page<ClothingPageDTO> clothPage = getClothesPage(pageable, type, category);
+        Page<ClothingPageDTO> clothesPage = getClothesPage(pageable, type, category);
 
-        return buildPagedResponse(clothPage);
+        return buildPagedResponse(clothesPage);
+    }
+
+    @GetMapping("/category")
+    public ResponseEntity<?> getCategories() {
+        Map<Category, Long> clothes = this.clothingService.getClothingCountByCategories();
+        return ResponseEntity.ok(clothes);
     }
 
     private Pageable getPageable(int page, int size, String sort) {
-        Sort.Direction direction = Sort.Direction.ASC;
+        Sort.Direction direction = Sort.Direction.DESC;
         String sortBy;
 
         switch (sort) {
             case "most-sold" -> sortBy = "saleCount";
             case "new" -> sortBy = "id";
-            case "price_desc" -> {
+            case "price_asc" -> {
                 sortBy = "price";
-                direction = Sort.Direction.DESC;
+                direction = Sort.Direction.ASC;
             }
-            case "price_asc" -> sortBy = "price";
-            case "name_desc" -> {
+            case "price_desc" -> sortBy = "price";
+            case "name_asc" -> {
                 sortBy = "name";
-                direction = Sort.Direction.DESC;
+                direction = Sort.Direction.ASC;
             }
             default -> sortBy = "name";
         }
@@ -171,15 +179,15 @@ public class ClothingController {
         return PageRequest.of(page - 1, size, Sort.by(direction, sortBy));
     }
 
-    private Page<ClothingPageDTO> getClothesPage(Pageable pageable, String type, String category) {
-        if (StringUtils.hasText(type) && StringUtils.hasText(category)) {
-            return this.clothService.findByTypeAndCategory(pageable, type, category);
+    private Page<ClothingPageDTO> getClothesPage(Pageable pageable, String type, List<String> category) {
+        if (StringUtils.hasText(type) && category != null && !category.isEmpty()) {
+            return this.clothingService.findByTypeAndCategory(pageable, type, category);
         } else if (StringUtils.hasText(type)) {
-            return this.clothService.findByType(pageable, type);
-        } else if (StringUtils.hasText(category)) {
-            return this.clothService.findByCategory(pageable, category);
+            return this.clothingService.findByType(pageable, type);
+        } else if (category != null && !category.isEmpty()) {
+            return this.clothingService.findByCategory(pageable, category);
         } else {
-            return this.clothService.getAllPage(pageable);
+            return this.clothingService.getAllPage(pageable);
         }
     }
 

@@ -23,19 +23,19 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         refreshToken.setUserEmail(userEmail);
         refreshToken.setExpiryDate(expiryDate);
         refreshToken.setRevoked(false);
-        refreshTokenRepository.save(refreshToken);
+        this.refreshTokenRepository.save(refreshToken);
     }
 
     @Override
     public boolean isValid(String tokenId) {
-        return refreshTokenRepository.findByTokenId(tokenId)
+        return this.refreshTokenRepository.findByTokenId(tokenId)
                 .filter(token -> !token.isRevoked() && token.getExpiryDate().isAfter(Instant.now()))
                 .isPresent();
     }
 
     @Override
     public void revokeToken(String tokenId) {
-        refreshTokenRepository.findByTokenId(tokenId).ifPresent(token -> {
+        this.refreshTokenRepository.findByTokenId(tokenId).ifPresent(token -> {
             token.setRevoked(true);
             refreshTokenRepository.save(token);
         });
@@ -43,6 +43,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Scheduled(cron = "0 * * * *")
     private void cleanupExpiredTokens() {
-        refreshTokenRepository.deleteByExpiryDateBefore(Instant.now());
+        this.refreshTokenRepository.deleteByExpiryDateBefore(Instant.now());
     }
 }
