@@ -16,10 +16,6 @@ public interface ImageService {
 
     Image saveImageInCloud(MultipartFile file, Clothing cloth, String side);
 
-    Image findByPublicIds(String publicId);
-
-    List<Image> saveImagesInCloud(ClothingDTO clothDTO, Clothing cloth);
-
     Image findByPath(String path);
 
     void deleteImage(Image byPath);

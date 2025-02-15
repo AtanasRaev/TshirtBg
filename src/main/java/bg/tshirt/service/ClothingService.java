@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ClothingService {
-    boolean addCloth(ClothingDTO clothAddDTO);
+    boolean addClothing(ClothingDTO clothAddDTO);
 
     ClothingDetailsPageDTO findById(Long id);
 
@@ -33,5 +33,5 @@ public interface ClothingService {
 
     boolean delete(Long id);
 
-    Map<Category, Long> getClothingCountByCategories();
+    Map<Category, Long> getClothingCountByCategories(String type);
 }

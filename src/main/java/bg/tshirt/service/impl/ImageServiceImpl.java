@@ -1,6 +1,5 @@
 package bg.tshirt.service.impl;
 
-import bg.tshirt.database.dto.ClothingDTO;
 import bg.tshirt.database.entity.Clothing;
 import bg.tshirt.database.entity.Image;
 import bg.tshirt.database.repository.ImageRepository;
@@ -56,19 +55,6 @@ public class ImageServiceImpl implements ImageService {
                     deleteImageFromCloudinary(image.getPublicId());
                 });
         this.imageRepository.deleteAll(allByPublicIds);
-    }
-
-    @Override
-    public Image findByPublicIds(String publicId) {
-        return this.imageRepository.findByPublicId(publicId).orElse(null);
-    }
-
-    @Override
-    public List<Image> saveImagesInCloud(ClothingDTO clothDTO, Clothing cloth) {
-        Image front = saveImageInCloud(clothDTO.getFrontImage(), cloth, "F");
-        Image back = saveImageInCloud(clothDTO.getBackImage(), cloth, "B");
-
-        return List.of(front, back);
     }
 
     @Override

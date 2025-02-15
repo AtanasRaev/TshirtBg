@@ -1,7 +1,6 @@
 package bg.tshirt.web;
 
 import bg.tshirt.database.dto.*;
-import bg.tshirt.database.entity.enums.Category;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothingService;
 import bg.tshirt.service.UserService;
@@ -37,7 +36,7 @@ public class ClothingController {
                                       HttpServletRequest request) {
         UserDTO admin = this.userService.validateAdmin(request);
 
-        if (!this.clothingService.addCloth(clothDTO)) {
+        if (!this.clothingService.addClothing(clothDTO)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("message", "Cloth with this model and type already exists."));
         }
@@ -152,9 +151,8 @@ public class ClothingController {
     }
 
     @GetMapping("/category")
-    public ResponseEntity<?> getCategories() {
-        Map<Category, Long> clothes = this.clothingService.getClothingCountByCategories();
-        return ResponseEntity.ok(clothes);
+    public ResponseEntity<?> getCategories(@RequestParam(required = false) String type) {
+        return ResponseEntity.ok(this.clothingService.getClothingCountByCategories(type));
     }
 
     private Pageable getPageable(int page, int size, String sort) {

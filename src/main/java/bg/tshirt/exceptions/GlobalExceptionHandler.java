@@ -85,4 +85,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(buildApiError("Internal Server Error", List.of(ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR));
     }
+
+    @ExceptionHandler(ClothingAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleClothingAlreadyExistsException(ClothingAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(buildApiError("Clothing already exists", List.of(ex.getMessage()), HttpStatus.CONFLICT));
+    }
 }

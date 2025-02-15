@@ -35,4 +35,7 @@ public interface ClothingRepository extends JpaRepository<Clothing, Long> {
 
     @Query("SELECT c.category, COUNT(c) FROM Clothing c GROUP BY c.category")
     List<Object[]> countClothingByCategory();
+
+    @Query("SELECT c.category, COUNT(c) FROM Clothing c WHERE LOWER(c.type) LIKE LOWER(:type) GROUP BY c.category")
+    List<Object[]> countClothingByCategory(String type);
 }
