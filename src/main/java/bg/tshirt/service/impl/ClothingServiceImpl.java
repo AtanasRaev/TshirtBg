@@ -91,7 +91,7 @@ public class ClothingServiceImpl implements ClothingService {
             return false;
         }
 
-        Optional<Clothing> byModelAndType = this.clothingRepository.findByModelAndType(clothingDTO.getModel(), clothingDTO.getType());
+        Optional<Clothing> byModelAndType = this.clothingRepository.findByModelAndType(clothingDTO.getModel() + getModelType(clothingDTO.getType()), clothingDTO.getType());
         if (byModelAndType.isPresent()) {
             if (clothing.getId() != byModelAndType.get().getId()) {
                 throw new ClothingAlreadyExistsException("Clothing with model " + clothingDTO.getModel() + " already exists.");
