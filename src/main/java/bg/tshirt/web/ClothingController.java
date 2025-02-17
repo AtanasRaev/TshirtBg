@@ -121,6 +121,8 @@ public class ClothingController {
 
     @GetMapping("/search")
     public ResponseEntity<?> searchCloth(@RequestParam(name = "name") String name,
+                                         @RequestParam(name = "type", required = false) String type,
+                                         @RequestParam(name = "sort", required = false) String sort,
                                          @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
                                          @RequestParam(defaultValue = "1") @Min(1) int page) {
 
@@ -131,8 +133,8 @@ public class ClothingController {
             ));
         }
 
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<ClothingPageDTO> clothesPage = this.clothingService.findByQuery(pageable, name);
+        Pageable pageable = getPageableSearch(page, size, sort);
+        Page<ClothingPageDTO> clothesPage = getSearchPage(pageable, name, type);
 
         return buildPagedResponse(clothesPage);
     }
@@ -153,6 +155,18 @@ public class ClothingController {
     @GetMapping("/category")
     public ResponseEntity<?> getCategories(@RequestParam(required = false) String type) {
         return ResponseEntity.ok(this.clothingService.getClothingCountByCategories(type));
+    }
+
+    private Pageable getPageableSearch(int page, int size, String sort) {
+        return StringUtils.hasText(sort) ? getPageable(page, size, sort) : PageRequest.of(page - 1, size);
+    }
+
+    private Page<ClothingPageDTO> getSearchPage(Pageable pageable, String name, String type) {
+        if (StringUtils.hasText(type) && StringUtils.hasText(name)) {
+            return this.clothingService.findByQuery(pageable, name, type);
+        } else {
+            return this.clothingService.findByQuery(pageable, name);
+        }
     }
 
     private Pageable getPageable(int page, int size, String sort) {

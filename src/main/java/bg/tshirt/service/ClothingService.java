@@ -21,6 +21,8 @@ public interface ClothingService {
 
     Page<ClothingPageDTO> findByQuery(Pageable pageable, String query);
 
+    Page<ClothingPageDTO> findByQuery(Pageable pageable, String query, String type);
+
     Page<ClothingPageDTO> findByCategory(Pageable pageable, List<String> category);
 
     Page<ClothingPageDTO> findByType(Pageable pageable, String type);

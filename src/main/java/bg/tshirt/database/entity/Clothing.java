@@ -1,7 +1,6 @@
 package bg.tshirt.database.entity;
 
 import bg.tshirt.database.entity.enums.Category;
-import bg.tshirt.database.entity.enums.Gender;
 import bg.tshirt.database.entity.enums.Type;
 import jakarta.persistence.*;
 

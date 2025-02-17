@@ -116,6 +116,12 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
+    public Page<ClothingPageDTO> findByQuery(Pageable pageable, String query, String type) {
+        return this.clothingRepository.findByQuery(pageable, "%" + query + "%", type)
+                .map(clothing -> this.modelMapper.map(clothing, ClothingPageDTO.class));
+    }
+
+    @Override
     public Page<ClothingPageDTO> findByCategory(Pageable pageable, List<String> category) {
         return this.clothingRepository.findByCategory(pageable, category.stream().map(String::toLowerCase).toList())
                 .map(clothing -> this.modelMapper.map(clothing, ClothingPageDTO.class));
@@ -137,7 +143,7 @@ public class ClothingServiceImpl implements ClothingService {
     public void setTotalSales(List<OrderItem> items, String newStatus, String oldStatus) {
         List<Clothing> allById = this.clothingRepository.findAllById(items
                 .stream()
-                .mapToLong(item -> item.getCloth().getId())
+                .mapToLong(item -> item.getClothing().getId())
                 .boxed()
                 .toList());
 
