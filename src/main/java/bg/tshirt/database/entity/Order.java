@@ -22,6 +22,9 @@ public class Order {
     @Column(nullable = false)
     private String address;
 
+    @Column(nullable = false)
+    private String phoneNumber;
+
     @Column
     private Double totalPrice;
 
@@ -64,6 +67,14 @@ public class Order {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public Double getTotalPrice() {

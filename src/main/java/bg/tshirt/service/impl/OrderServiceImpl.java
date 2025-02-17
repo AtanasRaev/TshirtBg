@@ -57,11 +57,6 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Order order = buildOrder(orderDTO, user);
-        List<OrderItem> items = buildOrderItems(orderDTO, order);
-
-        order.setItems(items);
-        double totalPrice = calculateTotalPrice(items);
-        order.setTotalPrice(totalPrice);
 
         user.getOrders().add(order);
         order.setUser(user);
@@ -74,15 +69,7 @@ public class OrderServiceImpl implements OrderService {
         if (orderDTO.getAddress() == null || orderDTO.getAddress().isBlank()) {
             throw new BadRequestException("Address not found");
         }
-
-        Order order = buildOrder(orderDTO, null);
-        List<OrderItem> items = buildOrderItems(orderDTO, order);
-
-        order.setItems(items);
-        double totalPrice = calculateTotalPrice(items);
-        order.setTotalPrice(totalPrice);
-
-        this.orderRepository.save(order);
+        this.orderRepository.save(buildOrder(orderDTO, null));
     }
 
     @Override
@@ -131,8 +118,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Order buildOrder(OrderDTO orderDTO, User user) {
+        Order order = setOrderDetails(orderDTO, user);
+        List<OrderItem> items = buildOrderItems(orderDTO, order);
+
+        order.setItems(items);
+        order.setTotalPrice(calculateTotalPrice(items));
+        return order;
+    }
+
+    private Order setOrderDetails(OrderDTO orderDTO, User user) {
         Order order = new Order();
         order.setAddress(orderDTO.getAddress());
+        order.setPhoneNumber(orderDTO.getPhoneNumber());
         order.setStatus("pending");
         order.setUser(user);
         return order;
@@ -155,16 +152,24 @@ public class OrderServiceImpl implements OrderService {
                         throw new NotFoundException("Cloth with id: " + itemDTO.getClothId() + " not found");
                     }
 
-                    OrderItem item = new OrderItem();
-                    item.setOrder(order);
-                    item.setCloth(cloth);
-                    item.setPrice(cloth.getPrice());
-                    item.setQuantity(itemDTO.getQuantity());
+                    OrderItem item = setOrderItemDetails(order, itemDTO, cloth);
                     order.getItems().add(item);
 
                     return item;
                 })
                 .toList();
+    }
+
+    private static OrderItem setOrderItemDetails(Order order, OrderItemDTO itemDTO, Clothing cloth) {
+        OrderItem item = new OrderItem();
+        item.setOrder(order);
+        item.setClothing(cloth);
+        item.setSize(itemDTO.getSize());
+        item.setGender(itemDTO.getGender());
+        item.setSleevesOptions(itemDTO.getSleevesOptions());
+        item.setPrice(cloth.getPrice());
+        item.setQuantity(itemDTO.getQuantity());
+        return item;
     }
 
     private double calculateTotalPrice(List<OrderItem> items) {

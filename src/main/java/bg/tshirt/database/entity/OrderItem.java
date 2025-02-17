@@ -1,5 +1,6 @@
 package bg.tshirt.database.entity;
 
+import bg.tshirt.database.entity.enums.Gender;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,8 +11,18 @@ public class OrderItem {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "cloth_id", referencedColumnName = "id")
-    private Clothing cloth;
+    @JoinColumn(name = "clothing_id", referencedColumnName = "id")
+    private Clothing clothing;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    @Column(nullable = false)
+    private String size;
+
+    @Column
+    private String sleevesOptions;
 
     @Column
     private int quantity;
@@ -47,12 +58,36 @@ public class OrderItem {
         this.price = price;
     }
 
-    public Clothing getCloth() {
-        return cloth;
+    public Clothing getClothing() {
+        return clothing;
     }
 
-    public void setCloth(Clothing cloth) {
-        this.cloth = cloth;
+    public void setClothing(Clothing cloth) {
+        this.clothing = cloth;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public String getSleevesOptions() {
+        return sleevesOptions;
+    }
+
+    public void setSleevesOptions(String sleevesOptions) {
+        this.sleevesOptions = sleevesOptions;
     }
 
     public Order getOrder() {

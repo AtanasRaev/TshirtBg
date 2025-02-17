@@ -4,6 +4,7 @@ import bg.tshirt.database.entity.enums.Category;
 import bg.tshirt.database.entity.enums.Type;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ClothingDTO {
@@ -20,6 +21,7 @@ public class ClothingDTO {
     private Category category;
 
     @NotBlank(message = "Model cannot be blank.")
+    @Size(min = 4, max = 4, message = "Model must be exactly 4 characters")
     private String model;
 
     private MultipartFile frontImage;
