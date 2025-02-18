@@ -7,6 +7,8 @@ public class UserProfileDTO extends UserDTO {
 
     private String lastName;
 
+    private String city;
+
     private String phoneNumber;
 
     private List<OrderPageDTO> orders;
@@ -25,6 +27,14 @@ public class UserProfileDTO extends UserDTO {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public String getPhoneNumber() {

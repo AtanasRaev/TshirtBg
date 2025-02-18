@@ -11,6 +11,7 @@ import bg.tshirt.exceptions.ClothingAlreadyExistsException;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothingService;
 import bg.tshirt.service.ImageService;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -116,8 +117,8 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
-    public Page<ClothingPageDTO> findByQuery(Pageable pageable, String query, String type) {
-        return this.clothingRepository.findByQuery(pageable, "%" + query + "%", type)
+    public Page<ClothingPageDTO> findByQuery(Pageable pageable, String query, List<String> type) {
+        return this.clothingRepository.findByQueryAndType(pageable, "%" + query + "%", type.stream().map(String::toLowerCase).toList())
                 .map(clothing -> this.modelMapper.map(clothing, ClothingPageDTO.class));
     }
 
@@ -156,24 +157,27 @@ public class ClothingServiceImpl implements ClothingService {
                 .map(clothing -> this.modelMapper.map(clothing, ClothingPageDTO.class));
     }
 
+    @Transactional
     @Override
     public boolean delete(Long id) {
         Optional<Clothing> optional = this.clothingRepository.findById(id);
-
         if (optional.isEmpty()) {
             return false;
         }
+        Clothing clothing = optional.get();
 
-        List<String> publicIds = optional.get().getImages()
+        List<String> publicIds = clothing.getImages()
                 .stream()
                 .map(Image::getPublicId)
                 .toList();
-
         this.imageService.deleteAll(publicIds);
-        this.clothingRepository.delete(optional.get());
 
+        clothing.getImages().clear();
+
+        this.clothingRepository.delete(clothing);
         return true;
     }
+
 
     @Override
     public Map<Category, Long> getClothingCountByCategories(String type) {

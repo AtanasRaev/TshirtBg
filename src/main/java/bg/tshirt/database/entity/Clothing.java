@@ -38,8 +38,7 @@ public class Clothing {
     private int saleCount = 0;
 
     @OneToMany(mappedBy = "cloth",
-            fetch = FetchType.EAGER,
-            orphanRemoval = true)
+            fetch = FetchType.EAGER)
     private List<Image> images;
 
     public Clothing(String name, String description, double price, String model, Type type, Category category) {

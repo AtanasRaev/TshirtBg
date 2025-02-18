@@ -25,7 +25,11 @@ public class UserRegistrationDTO {
     @Size(min = 13, max = 13, message = "Phone number must be 13 characters")
     private String phoneNumber;
 
+    @NotBlank(message = "Address cannot be empty")
     private String address;
+
+    @NotBlank(message = "City cannot be empty")
+    private String city;
 
     public UserRegistrationDTO() {
     }
@@ -76,5 +80,13 @@ public class UserRegistrationDTO {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity (String city) {
+        this.city = city;
     }
 }

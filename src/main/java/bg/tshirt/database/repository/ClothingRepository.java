@@ -19,8 +19,8 @@ public interface ClothingRepository extends JpaRepository<Clothing, Long> {
     @Query("SELECT c FROM Clothing c WHERE LOWER(c.name) LIKE LOWER(:query) OR LOWER(c.model) LIKE LOWER(:query)")
     Page<Clothing> findByQuery(Pageable pageable, @Param("query") String query);
 
-    @Query("SELECT c FROM Clothing c WHERE (LOWER(c.name) LIKE LOWER(:query) OR LOWER(c.model) LIKE LOWER(:query)) AND LOWER(c.type) LIKE LOWER(:type)")
-    Page<Clothing> findByQuery(Pageable pageable, @Param("query") String query, @Param("type") String type);
+    @Query("SELECT c FROM Clothing c WHERE (LOWER(c.name) LIKE LOWER(:query) OR LOWER(c.model) LIKE LOWER(:query)) AND LOWER(c.type) IN (:type)")
+    Page<Clothing> findByQueryAndType(Pageable pageable, @Param("query") String query, @Param("type") List<String> type);
 
     @Query("SELECT c FROM Clothing c WHERE LOWER(c.category) IN (:category)")
     Page<Clothing> findByCategory(Pageable pageable, @Param("category") List<String> category);
