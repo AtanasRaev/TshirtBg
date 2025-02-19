@@ -47,3 +47,7 @@ cloud:
   cloudName: ${CLOUD_NAME}
   apiKey: ${API_KEY}
   apiSecret: ${API_SECRET}
+ekont:
+  api:
+    urlCities: https://ee.econt.com/services/Nomenclatures/NomenclaturesService.getCities.json
+    urlOffices: https://ee.econt.com/services/Nomenclatures/NomenclaturesService.getOffices.json
