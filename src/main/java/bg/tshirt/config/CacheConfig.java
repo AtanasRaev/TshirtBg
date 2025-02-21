@@ -12,9 +12,9 @@ import java.util.concurrent.TimeUnit;
 public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager("ekontCities");
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager("econtCities");
         cacheManager.setCaffeine(Caffeine.newBuilder()
-                .expireAfterWrite(30, TimeUnit.MINUTES)
+                .expireAfterWrite(5, TimeUnit.DAYS)
                 .maximumSize(100));
         return cacheManager;
     }
