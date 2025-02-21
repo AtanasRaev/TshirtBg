@@ -12,8 +12,26 @@ import java.util.List;
 @Table(name = "orders")
 public class Order {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
+    @Column(name = "lats_name", nullable = false)
+    private String lastName;
+
+    @Column(nullable = false, length = 100)
+    private String email;
+
+    @Column(nullable = false)
+    private boolean selectedOffice;
+
+    @Column
+    private double deliveryCost;
+
+    @Column
+    private double finalPrice;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -26,7 +44,7 @@ public class Order {
     private String phoneNumber;
 
     @Column
-    private Double totalPrice;
+    private double totalPrice;
 
     @Column
     private String status;
@@ -39,10 +57,37 @@ public class Order {
     @Column(nullable = false)
     private Instant updatedAt;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "order",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.EAGER)
     private List<OrderItem> items = new ArrayList<>();
 
+
     public Order() {
+    }
+
+    public Order(String firstName,
+                 String lastName,
+                 String email,
+                 boolean selectedOffice,
+                 double deliveryCost,
+                 double finalPrice,
+                 User user,
+                 String address,
+                 String phoneNumber,
+                 double totalPrice,
+                 String status) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.selectedOffice = selectedOffice;
+        this.deliveryCost = deliveryCost;
+        this.finalPrice = finalPrice;
+        this.user = user;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.totalPrice = totalPrice;
+        this.status = status;
     }
 
     public Long getId() {
@@ -51,6 +96,54 @@ public class Order {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public boolean isSelectedOffice() {
+        return selectedOffice;
+    }
+
+    public void setSelectedOffice(boolean selectedOffice) {
+        this.selectedOffice = selectedOffice;
+    }
+
+    public double getDeliveryCost() {
+        return deliveryCost;
+    }
+
+    public void setDeliveryCost(double deliveryCost) {
+        this.deliveryCost = deliveryCost;
+    }
+
+    public double getFinalPrice() {
+        return finalPrice;
+    }
+
+    public void setFinalPrice(double finalPrice) {
+        this.finalPrice = finalPrice;
     }
 
     public User getUser() {
@@ -77,11 +170,11 @@ public class Order {
         this.phoneNumber = phoneNumber;
     }
 
-    public Double getTotalPrice() {
+    public double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(Double totalPrice) {
+    public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
     }
 
