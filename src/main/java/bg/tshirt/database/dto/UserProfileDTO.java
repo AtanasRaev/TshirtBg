@@ -9,6 +9,8 @@ public class UserProfileDTO extends UserDTO {
 
     private String city;
 
+    private String region;
+
     private String phoneNumber;
 
     private List<OrderPageDTO> orders;
@@ -35,6 +37,14 @@ public class UserProfileDTO extends UserDTO {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 
     public String getPhoneNumber() {

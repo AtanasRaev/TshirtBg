@@ -1,8 +1,5 @@
 package bg.tshirt.database.dto;
 
-import bg.tshirt.database.entity.enums.Role;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
 public class UserResponseDTO {

@@ -31,6 +31,9 @@ public class UserRegistrationDTO {
     @NotBlank(message = "City cannot be empty")
     private String city;
 
+    @NotBlank(message = "Region cannot be empty")
+    private String region;
+
     public UserRegistrationDTO() {
     }
 
@@ -88,5 +91,13 @@ public class UserRegistrationDTO {
 
     public void setCity (String city) {
         this.city = city;
+    }
+
+    public @NotBlank(message = "Region cannot be empty") String getRegion() {
+        return region;
+    }
+
+    public void setRegion(@NotBlank(message = "Region cannot be empty") String region) {
+        this.region = region;
     }
 }

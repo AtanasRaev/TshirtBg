@@ -1,7 +1,9 @@
 package bg.tshirt.web;
 
 import bg.tshirt.config.JwtTokenProvider;
-import bg.tshirt.database.dto.*;
+import bg.tshirt.database.dto.UserLoginDTO;
+import bg.tshirt.database.dto.UserRegistrationDTO;
+import bg.tshirt.database.dto.UserResponseDTO;
 import bg.tshirt.service.RefreshTokenService;
 import bg.tshirt.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,8 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -37,15 +37,7 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(HttpServletRequest request) {
-        UserProfileDTO user = this.userService.getUserProfile(request);
-
-        Map<String, Object> profile = Map.of(
-                "email", user.getEmail(),
-                "address", user.getAddress(),
-                "orders", user.getOrders()
-        );
-
-        return ResponseEntity.ok(profile);
+        return ResponseEntity.ok(this.userService.getUserProfile(request));
     }
 
     @PostMapping("/register")

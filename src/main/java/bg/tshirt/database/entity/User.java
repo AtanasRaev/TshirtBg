@@ -28,6 +28,12 @@ public class User {
     private String phoneNumber;
 
     @Column
+    private String city;
+
+    @Column
+    private String region;
+
+    @Column
     private String address;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
@@ -47,6 +53,8 @@ public class User {
                 String firstName,
                 String secondName,
                 String phoneNumber,
+                String city,
+                String region,
                 String address,
                 Set<Role> roles) {
         this.email = email;
@@ -55,6 +63,8 @@ public class User {
         this.lastName = secondName;
         this.phoneNumber = phoneNumber;
         this.address = Objects.requireNonNullElse(address, "");
+        this.city = city;
+        this.region = region;
         this.roles = roles;
     }
 
@@ -104,6 +114,22 @@ public class User {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 
     public String getAddress() {
