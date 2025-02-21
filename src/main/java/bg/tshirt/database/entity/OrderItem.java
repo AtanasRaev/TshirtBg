@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 @Table(name = "order_items")
 public class OrderItem {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -22,7 +22,7 @@ public class OrderItem {
     private String size;
 
     @Column
-    private String sleevesOptions;
+    private String type;
 
     @Column
     private int quantity;
@@ -82,12 +82,12 @@ public class OrderItem {
         this.size = size;
     }
 
-    public String getSleevesOptions() {
-        return sleevesOptions;
+    public String getType() {
+        return type;
     }
 
-    public void setSleevesOptions(String sleevesOptions) {
-        this.sleevesOptions = sleevesOptions;
+    public void setType(String sleevesOptions) {
+        this.type = sleevesOptions;
     }
 
     public Order getOrder() {

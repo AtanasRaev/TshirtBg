@@ -3,22 +3,24 @@ package bg.tshirt.database.dto;
 import bg.tshirt.database.entity.enums.Gender;
 
 public class OrderItemDTO {
-    private Long clothId;
+    private Long id;
 
     private Gender gender;
 
     private String size;
 
-    private String sleevesOptions;
+    private String type;
 
     private int quantity;
 
-    public Long getClothId() {
-        return clothId;
+    private Double price;
+
+    public Long getId() {
+        return id;
     }
 
-    public void setClothId(Long clothId) {
-        this.clothId = clothId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Gender getGender() {
@@ -37,16 +39,24 @@ public class OrderItemDTO {
         this.size = size;
     }
 
-    public String getSleevesOptions() {
-        return sleevesOptions;
+    public String getType() {
+        return type;
     }
 
-    public void setSleevesOptions(String sleevesOptions) {
-        this.sleevesOptions = sleevesOptions;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public int getQuantity() {
         return quantity;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
     public void setQuantity(int quantity) {
