@@ -1,6 +1,6 @@
-package bg.tshirt.database.dto.ekontDTO;
+package bg.tshirt.database.dto.econtDTO;
 
-public class EkontCitiesDTO {
+public class EcontCitiesDTO {
     private Long id;
 
     private String name;

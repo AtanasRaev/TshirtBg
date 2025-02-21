@@ -1,9 +1,9 @@
-package bg.tshirt.database.dto.ekontDTO;
+package bg.tshirt.database.dto.econtDTO;
 
-public class EkontOfficesDTO {
+public class EcontOfficesDTO {
     private String name;
 
-    private EkontAddress address;
+    private EcontAddress address;
 
     public String getName() {
         return name;
@@ -13,11 +13,11 @@ public class EkontOfficesDTO {
         this.name = name;
     }
 
-    public EkontAddress getAddress() {
+    public EcontAddress getAddress() {
         return address;
     }
 
-    public void setAddress(EkontAddress address) {
+    public void setAddress(EcontAddress address) {
         this.address = address;
     }
 }

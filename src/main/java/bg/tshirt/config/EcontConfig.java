@@ -4,11 +4,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class EkontConfig {
-    @Value("${ekont.api.urlCities}")
+public class EcontConfig {
+    @Value("${econt.api.urlCities}")
     private String urlCities;
 
-    @Value("${ekont.api.urlOffices}")
+    @Value("${econt.api.urlOffices}")
     private String urlOffices;
 
     public String getUrlCities() {

@@ -1,23 +1,23 @@
-package bg.tshirt.database.dto.ekontDTO;
+package bg.tshirt.database.dto.econtDTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class EkontBodyApi {
+public class EcontBodyApi {
     private String countryCode;
 
     @JsonProperty("cityID")
     private Long cityId;
 
-    public EkontBodyApi(String countryCode) {
+    public EcontBodyApi(String countryCode) {
         this.countryCode = countryCode;
     }
 
-    public EkontBodyApi(String countryCode, Long cityId) {
+    public EcontBodyApi(String countryCode, Long cityId) {
         this.countryCode = countryCode;
         this.cityId = cityId;
     }
 
-    public EkontBodyApi() {
+    public EcontBodyApi() {
     }
 
     public String getCountryCode() {

@@ -1,6 +1,6 @@
-package bg.tshirt.database.dto.ekontDTO;
+package bg.tshirt.database.dto.econtDTO;
 
-public class EkontAddress {
+public class EcontAddress {
     private String fullAddress;
 
     private String fullAddressEn;
