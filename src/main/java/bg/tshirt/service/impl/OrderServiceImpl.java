@@ -12,6 +12,7 @@ import bg.tshirt.exceptions.BadRequestException;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothingService;
 import bg.tshirt.service.OrderService;
+import bg.tshirt.utils.PhoneNumberValidator;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -30,17 +31,20 @@ public class OrderServiceImpl implements OrderService {
     private final ClothingRepository clothRepository;
     private final UserRepository userRepository;
     private final ClothingService clothService;
+    private final PhoneNumberValidator phoneNumberValidator;
     private final ModelMapper modelMapper;
 
     public OrderServiceImpl(OrderRepository orderRepository,
                             ClothingRepository clothRepository,
                             UserRepository userRepository,
                             ClothingService clothService,
+                            PhoneNumberValidator phoneNumberValidator,
                             ModelMapper modelMapper) {
         this.orderRepository = orderRepository;
         this.clothRepository = clothRepository;
         this.userRepository = userRepository;
         this.clothService = clothService;
+        this.phoneNumberValidator = phoneNumberValidator;
 
         this.modelMapper = modelMapper;
     }
@@ -49,27 +53,24 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void createOrder(OrderDTO orderDTO, UserDTO userDTO) {
         User user = validateUser(userDTO);
-
-        if ((orderDTO.getAddress() == null || orderDTO.getAddress().isBlank()) && (user.getAddress() != null && !user.getAddress().isBlank())) {
-            orderDTO.setAddress(user.getAddress());
-        } else if (orderDTO.getAddress() == null || orderDTO.getAddress().isBlank()) {
-            throw new BadRequestException("Address not found");
-        }
-
         Order order = buildOrder(orderDTO, user);
 
         user.getOrders().add(order);
         order.setUser(user);
 
-        orderRepository.save(order);
+        this.orderRepository.save(order);
     }
 
     @Override
     public void createOrder(OrderDTO orderDTO) {
-        if (orderDTO.getAddress() == null || orderDTO.getAddress().isBlank()) {
-            throw new BadRequestException("Address not found");
+        Optional<User> optional = this.userRepository.findByEmail(orderDTO.getEmail());
+        User user = null;
+
+        if (optional.isPresent()) {
+            user = optional.get();
         }
-        this.orderRepository.save(buildOrder(orderDTO, null));
+
+        this.orderRepository.save(buildOrder(orderDTO, user));
     }
 
     @Override
@@ -119,40 +120,48 @@ public class OrderServiceImpl implements OrderService {
 
     private Order buildOrder(OrderDTO orderDTO, User user) {
         Order order = setOrderDetails(orderDTO, user);
-        List<OrderItem> items = buildOrderItems(orderDTO, order);
+        List<OrderItem> cart = buildOrderItems(orderDTO, order);
 
-        order.setItems(items);
-        order.setTotalPrice(calculateTotalPrice(items));
+        order.setItems(cart);
         return order;
     }
 
     private Order setOrderDetails(OrderDTO orderDTO, User user) {
-        Order order = new Order();
-        order.setAddress(orderDTO.getAddress());
-        order.setPhoneNumber(orderDTO.getPhoneNumber());
-        order.setStatus("pending");
-        order.setUser(user);
-        return order;
+        this.phoneNumberValidator.validateBulgarianPhoneNumber(orderDTO.getPhoneNumber());
+        return new Order(
+                orderDTO.getFirstName(),
+                orderDTO.getLastName(),
+                orderDTO.getEmail(),
+                orderDTO.getSelectedOffice() != null,
+                orderDTO.getDeliveryCost(),
+                orderDTO.getFinalPrice(),
+                user,
+                orderDTO.getSelectedOffice() != null ? orderDTO.getSelectedOffice() :orderDTO.getCity() + " (" + orderDTO.getRegion() + ") " + orderDTO.getAddress().trim(),
+                orderDTO.getPhoneNumber(),
+                orderDTO.getTotalPrice(),
+                "pending"
+        );
     }
 
     private List<OrderItem> buildOrderItems(OrderDTO orderDTO, Order order) {
-        List<Long> clothIds = orderDTO.getItems().stream()
-                .map(OrderItemDTO::getClothId)
+        List<Long> clothesIds = orderDTO.getCart().stream()
+                .map(OrderItemDTO::getId)
                 .toList();
 
-        Map<Long, Clothing> clothMap = this.clothRepository.findAllById(clothIds)
+        Map<Long, Clothing> clothesMap = this.clothRepository.findAllById(clothesIds)
                 .stream()
                 .collect(Collectors.toMap(Clothing::getId, Function.identity()));
 
-        return orderDTO.getItems()
+        return orderDTO.getCart()
                 .stream()
                 .map(itemDTO -> {
-                    Clothing cloth = clothMap.get(itemDTO.getClothId());
-                    if (cloth == null) {
-                        throw new NotFoundException("Cloth with id: " + itemDTO.getClothId() + " not found");
+                    Clothing clothing = clothesMap.get(itemDTO.getId());
+
+                    if (clothing == null) {
+                        throw new NotFoundException("Cloth with id: " + itemDTO.getId() + " not found");
                     }
 
-                    OrderItem item = setOrderItemDetails(order, itemDTO, cloth);
+                    OrderItem item = setOrderItemDetails(order, itemDTO, clothing);
                     order.getItems().add(item);
 
                     return item;
@@ -166,15 +175,9 @@ public class OrderServiceImpl implements OrderService {
         item.setClothing(cloth);
         item.setSize(itemDTO.getSize());
         item.setGender(itemDTO.getGender());
-        item.setSleevesOptions(itemDTO.getSleevesOptions());
-        item.setPrice(cloth.getPrice());
+        item.setType(itemDTO.getType());
+        item.setPrice(itemDTO.getPrice());
         item.setQuantity(itemDTO.getQuantity());
         return item;
-    }
-
-    private double calculateTotalPrice(List<OrderItem> items) {
-        return items.stream()
-                .mapToDouble(item -> item.getPrice() * item.getQuantity())
-                .sum();
     }
 }
