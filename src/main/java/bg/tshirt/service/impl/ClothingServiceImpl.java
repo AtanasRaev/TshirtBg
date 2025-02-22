@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -141,14 +142,23 @@ public class ClothingServiceImpl implements ClothingService {
     }
 
     @Override
-    public void setTotalSales(List<OrderItem> items, String newStatus, String oldStatus) {
-        List<Clothing> allById = this.clothingRepository.findAllById(items
-                .stream()
-                .mapToLong(item -> item.getClothing().getId())
-                .boxed()
-                .toList());
+    public void setTotalSales(List<OrderItem> items) {
+        Map<Long, Integer> clothingQuantityMap = items.stream()
+                .collect(Collectors.groupingBy(
+                        item -> item.getClothing().getId(),
+                        Collectors.summingInt(OrderItem::getQuantity)
+                ));
 
-        allById.forEach(Clothing::updateTotalSales);
+        List<Clothing> allById = this.clothingRepository.findAllById(clothingQuantityMap.keySet());
+
+        allById.forEach(clothing -> {
+            int totalQuantity = clothingQuantityMap.get(clothing.getId());
+            for (int i = 0; i < totalQuantity; i++) {
+                clothing.updateTotalSales();
+            }
+        });
+
+        this.clothingRepository.saveAll(allById);
     }
 
     @Override

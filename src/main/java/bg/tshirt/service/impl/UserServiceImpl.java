@@ -1,7 +1,6 @@
 package bg.tshirt.service.impl;
 
 import bg.tshirt.config.JwtTokenProvider;
-import bg.tshirt.database.dto.OrderPageDTO;
 import bg.tshirt.database.dto.UserDTO;
 import bg.tshirt.database.dto.UserProfileDTO;
 import bg.tshirt.database.dto.UserRegistrationDTO;
@@ -12,16 +11,16 @@ import bg.tshirt.exceptions.EmailAlreadyInUseException;
 import bg.tshirt.exceptions.ForbiddenException;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.exceptions.UnauthorizedException;
+import bg.tshirt.service.OrderService;
 import bg.tshirt.service.UserService;
-import bg.tshirt.utils.PhoneNumberValidator;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import bg.tshirt.utils.PhoneNumberUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,21 +29,24 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final OrderService orderService;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
-    private final PhoneNumberValidator phoneNumberValidator;
+    private final PhoneNumberUtils phoneNumberUtils;
     private final static int ADMINS_COUNT = 2;
 
     public UserServiceImpl(UserRepository userRepository,
                            JwtTokenProvider jwtTokenProvider,
+                           OrderService orderService,
                            PasswordEncoder passwordEncoder,
                            ModelMapper modelMapper,
-                           PhoneNumberValidator phoneNumberValidator) {
+                           PhoneNumberUtils phoneNumberUtils) {
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.orderService = orderService;
         this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
-        this.phoneNumberValidator = phoneNumberValidator;
+        this.phoneNumberUtils = phoneNumberUtils;
     }
 
     @Override
@@ -54,7 +56,7 @@ public class UserServiceImpl implements UserService {
             throw new EmailAlreadyInUseException("Email is already in use");
         }
 
-        this.phoneNumberValidator.validateBulgarianPhoneNumber(registrationDTO.getPhoneNumber());
+        this.phoneNumberUtils.validateBulgarianPhoneNumber(registrationDTO.getPhoneNumber());
 
         Set<Role> roles = determineRoles();
 
@@ -63,7 +65,7 @@ public class UserServiceImpl implements UserService {
                 this.passwordEncoder.encode(registrationDTO.getPassword()),
                 registrationDTO.getFirstName(),
                 registrationDTO.getLastName(),
-                registrationDTO.getPhoneNumber(),
+                this.phoneNumberUtils.formatPhoneNumber(registrationDTO.getPhoneNumber()),
                 registrationDTO.getCity(),
                 registrationDTO.getRegion(),
                 registrationDTO.getAddress(),
@@ -76,7 +78,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO findByEmail(String email) {
         return this.userRepository.findByEmail(email)
-                .map(user -> new UserDTO(user.getEmail(), user.getAddress()))
+                .map(user -> new UserDTO(user.getEmail(), user.getAddress(), user.getRoles()))
                 .orElse(null);
     }
 
@@ -114,14 +116,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserProfileDTO mapToUserProfileDTO(User user) {
-        UserProfileDTO userProfileDTO = modelMapper.map(user, UserProfileDTO.class);
-        List<OrderPageDTO> sortedOrders = userProfileDTO.getOrders().stream()
-                .sorted(Comparator.comparing(OrderPageDTO::getCreatedAt))
-                .toList();
-        userProfileDTO.setOrders(sortedOrders);
-        return userProfileDTO;
+        return modelMapper.map(user, UserProfileDTO.class);
     }
-
 
 
     private void validateAdminRole(String token) {

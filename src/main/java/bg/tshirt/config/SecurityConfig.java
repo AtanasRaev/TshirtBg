@@ -43,7 +43,7 @@ public class SecurityConfig {
                                     "/users/register",
                                     "/orders/create",
                                     "/refresh-token",
-                                    "econt/**",
+                                    "/econt/**",
                                     "/ping"
                             ).permitAll()
                             .requestMatchers(HttpMethod.PUT, "/clothes/**").authenticated()

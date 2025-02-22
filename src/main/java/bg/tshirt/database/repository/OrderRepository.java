@@ -10,6 +10,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    @Query("SELECT o FROM Order o WHERE o.status = :status")
+    @Query("SELECT o FROM Order o WHERE LOWER(o.status) LIKE LOWER(:status)")
     Page<Order> findAllByStatus(Pageable pageable, @Param("status") String status);
+
+    @Query("SELECT o FROM Order o WHERE o.user.email = :userEmail")
+    Page<Order> findByUserId(@Param("userEmail") String userEmail, Pageable pageable);
+
 }

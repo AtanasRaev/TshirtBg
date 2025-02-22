@@ -7,10 +7,10 @@ import com.google.i18n.phonenumbers.Phonenumber;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PhoneNumberValidator {
+public class PhoneNumberUtils {
     private final PhoneNumberUtil phoneNumberUtil;
 
-    public PhoneNumberValidator(PhoneNumberUtil phoneNumberUtil) {
+    public PhoneNumberUtils(PhoneNumberUtil phoneNumberUtil) {
         this.phoneNumberUtil = phoneNumberUtil;
     }
 
@@ -23,5 +23,9 @@ public class PhoneNumberValidator {
         } catch (NumberParseException e) {
             throw new InvalidPhoneNumberException("Invalid phone number format: " + phone);
         }
+    }
+
+    public String formatPhoneNumber(String phoneNumber) {
+        return phoneNumber.replaceAll("(\\+\\d{3})(\\d{3})(\\d{3})(\\d{3})", "$1 $2 $3 $4");
     }
 }

@@ -33,6 +33,9 @@ public class Order {
     @Column
     private double finalPrice;
 
+    @Column
+    private double totalPrice;
+
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
@@ -42,9 +45,6 @@ public class Order {
 
     @Column(nullable = false)
     private String phoneNumber;
-
-    @Column
-    private double totalPrice;
 
     @Column
     private String status;

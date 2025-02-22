@@ -4,6 +4,7 @@ import bg.tshirt.database.dto.OrderDTO;
 import bg.tshirt.database.dto.OrderPageDTO;
 import bg.tshirt.database.dto.OrdersDetailsDTO;
 import bg.tshirt.database.dto.UserDTO;
+import bg.tshirt.database.entity.enums.Role;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.exceptions.UnauthorizedException;
 import bg.tshirt.service.OrderService;
@@ -46,19 +47,19 @@ public class OrderController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<?> listOrders(@RequestParam(name = "status") String status,
-                                        @RequestParam(name = "sort", defaultValue = "oldest") String sort,
+    public ResponseEntity<?> listOrders(@RequestParam(name = "status", defaultValue = "all") String status,
+                                        @RequestParam(name = "sort", defaultValue = "newest") String sort,
                                         @RequestParam(defaultValue = "10") @Min(4) @Max(100) int size,
                                         @RequestParam(defaultValue = "1") @Min(1) int page,
                                         HttpServletRequest request) {
-        this.userService.validateAdmin(request);
+        UserDTO userDTO = this.userService.validateUser(request);
 
         if (!isValidSortOption(sort)) {
             return badRequestResponse();
         }
 
         Pageable pageable = createPageable(page, size, sort);
-        Page<OrderPageDTO> orderPage = this.orderService.getAllOrdersByStatus(pageable, status);
+        Page<OrderPageDTO> orderPage = getListOrdersPage(pageable, status, userDTO);
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
@@ -114,7 +115,7 @@ public class OrderController {
             throw new IllegalArgumentException("Status must not be empty");
         }
 
-        if (!"confirm".equals(status) && !"reject".equals(status) && !"pending".equals(status)) {
+        if (!"confirm".equalsIgnoreCase(status) && !"reject".equalsIgnoreCase(status) && !"pending".equalsIgnoreCase(status)) {
             throw new IllegalArgumentException("Status must 'confirm', 'reject' or 'pending'");
         }
     }
@@ -126,6 +127,14 @@ public class OrderController {
     private Pageable createPageable(int page, int size, String sort) {
         Sort.Direction direction = sort.equals("oldest") ? Sort.Direction.ASC : Sort.Direction.DESC;
         return PageRequest.of(page - 1, size, Sort.by(direction, "createdAt"));
+    }
+
+    private Page<OrderPageDTO> getListOrdersPage(Pageable pageable, String status, UserDTO userDTO) {
+        if ("all".equalsIgnoreCase(status)) {
+            return userDTO.getRoles().contains(Role.ADMIN) ? this.orderService.getAllOrders(pageable) : this.orderService.findOrdersByUser(userDTO.getEmail(), pageable);
+        } else {
+            return userDTO.getRoles().contains(Role.ADMIN) ? this.orderService.getAllOrdersByStatus(pageable, status) : Page.empty();
+        }
     }
 
     private ResponseEntity<?> successResponse(String message) {

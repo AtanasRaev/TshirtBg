@@ -1,9 +1,6 @@
 package bg.tshirt.service;
 
-import bg.tshirt.database.dto.ClothEditDTO;
-import bg.tshirt.database.dto.ClothingDTO;
-import bg.tshirt.database.dto.ClothingDetailsPageDTO;
-import bg.tshirt.database.dto.ClothingPageDTO;
+import bg.tshirt.database.dto.*;
 import bg.tshirt.database.entity.OrderItem;
 import bg.tshirt.database.entity.enums.Category;
 import org.springframework.data.domain.Page;
@@ -29,7 +26,7 @@ public interface ClothingService {
 
     Page<ClothingPageDTO> findByTypeAndCategory(Pageable pageable, String type, List<String> category);
 
-    void setTotalSales(List<OrderItem> items, String newStatus, String oldStatus);
+    void setTotalSales(List<OrderItem> items);
 
     Page<ClothingPageDTO> getAllPage(Pageable pageable);
 

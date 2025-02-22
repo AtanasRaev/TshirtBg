@@ -1,30 +1,38 @@
 package bg.tshirt.database.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 public class OrderPageDTO {
     private Long id;
 
+    private String customer;
+
+    private String status;
+
+    private Double totalPrice;
+
+    private Integer quantity;
+
     @JsonIgnore
     private Instant createdAt;
 
-    private String address;
-
-    private List<OrderItemPageDTO> items;
-
+    @JsonProperty
     public String createdAt() {
-        if (createdAt == null) {
+        if (this.getCreatedAt() == null) {
             return null;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
                 .withZone(ZoneId.systemDefault());
-        return formatter.format(createdAt);
+        return formatter.format(this.getCreatedAt());
+    }
+
+    public OrderPageDTO() {
     }
 
     public Long getId() {
@@ -43,19 +51,35 @@ public class OrderPageDTO {
         this.createdAt = createdAt;
     }
 
-    public String getAddress() {
-        return address;
+    public String getCustomer() {
+        return customer;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setCustomer(String customer) {
+        this.customer = customer;
     }
 
-    public List<OrderItemPageDTO> getItems() {
-        return items;
+    public String getStatus() {
+        return status;
     }
 
-    public void setItems(List<OrderItemPageDTO> items) {
-        this.items = items;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 }
