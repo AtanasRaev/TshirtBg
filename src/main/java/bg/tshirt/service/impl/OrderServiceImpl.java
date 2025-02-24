@@ -10,6 +10,7 @@ import bg.tshirt.database.repository.OrderRepository;
 import bg.tshirt.database.repository.UserRepository;
 import bg.tshirt.exceptions.NotFoundException;
 import bg.tshirt.service.ClothingService;
+import bg.tshirt.service.EmailService;
 import bg.tshirt.service.OrderService;
 import bg.tshirt.utils.PhoneNumberUtils;
 import jakarta.transaction.Transactional;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,7 @@ public class OrderServiceImpl implements OrderService {
     private final ClothingRepository clothRepository;
     private final UserRepository userRepository;
     private final ClothingService clothingService;
+    private final EmailService emailService;
     private final PhoneNumberUtils phoneNumberUtils;
     private final ModelMapper modelMapper;
 
@@ -37,12 +40,14 @@ public class OrderServiceImpl implements OrderService {
                             ClothingRepository clothRepository,
                             UserRepository userRepository,
                             ClothingService clothingService,
+                            EmailService emailService,
                             PhoneNumberUtils phoneNumberUtils,
                             ModelMapper modelMapper) {
         this.orderRepository = orderRepository;
         this.clothRepository = clothRepository;
         this.userRepository = userRepository;
         this.clothingService = clothingService;
+        this.emailService = emailService;
         this.phoneNumberUtils = phoneNumberUtils;
 
         this.modelMapper = modelMapper;
@@ -58,6 +63,7 @@ public class OrderServiceImpl implements OrderService {
         order.setUser(user);
 
         this.orderRepository.save(order);
+        this.emailService.sendOrderEmail(order);
     }
 
     @Override
@@ -68,8 +74,11 @@ public class OrderServiceImpl implements OrderService {
         if (optional.isPresent()) {
             user = optional.get();
         }
+        Order order = buildOrder(orderDTO, user);
 
-        this.orderRepository.save(buildOrder(orderDTO, user));
+        this.orderRepository.save(order);
+
+        this.emailService.sendOrderEmail(order);
     }
 
     @Override

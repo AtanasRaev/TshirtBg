@@ -22,7 +22,7 @@ public class UserRegistrationDTO {
     private String lastName;
 
     @NotBlank(message = "Phone number cannot be empty")
-    @Size(min = 13, max = 13, message = "Phone number must be 13 characters")
+    @Size(min = 16, max = 16, message = "Phone number must be 16 characters")
     private String phoneNumber;
 
     @NotBlank(message = "Address cannot be empty")

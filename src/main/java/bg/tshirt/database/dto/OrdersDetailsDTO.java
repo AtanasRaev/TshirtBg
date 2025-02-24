@@ -41,8 +41,8 @@ public class OrdersDetailsDTO {
             return null;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
-                .withZone(ZoneId.systemDefault());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                .withZone(ZoneId.of("Europe/Sofia"));
         return formatter.format(this.getCreatedAt());
     }
 
@@ -52,8 +52,8 @@ public class OrdersDetailsDTO {
             return null;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
-                .withZone(ZoneId.systemDefault());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                .withZone(ZoneId.of("Europe/Sofia"));
         return formatter.format(this.getUpdatedAt());
     }
 

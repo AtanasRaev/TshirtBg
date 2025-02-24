@@ -73,7 +73,7 @@ public class OrderController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getOrder(@PathVariable Long id, HttpServletRequest request) {
-        this.userService.validateAdmin(request);
+        this.userService.validateUser(request);
 
         validateId(id);
 

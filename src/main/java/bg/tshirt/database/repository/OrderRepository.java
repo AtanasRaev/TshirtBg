@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE LOWER(o.status) LIKE LOWER(:status)")
@@ -16,4 +18,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE o.user.email = :userEmail")
     Page<Order> findByUserId(@Param("userEmail") String userEmail, Pageable pageable);
 
+    @Query("SELECT u.id FROM User u ORDER BY u.id DESC")
+    Optional<Long> findLastId();
 }

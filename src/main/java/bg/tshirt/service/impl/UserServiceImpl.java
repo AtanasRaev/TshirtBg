@@ -17,12 +17,12 @@ import bg.tshirt.utils.PhoneNumberUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -96,11 +96,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveUser(User user) {
-        this.userRepository.save(user);
-    }
-
-    @Override
     @Transactional
     public UserProfileDTO getUserProfile(HttpServletRequest request) {
         UserDTO userDTO = validateUser(request);
@@ -113,6 +108,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<String> getUserRoles(String accessToken) {
         return this.jwtTokenProvider.getRoles(accessToken);
+    }
+
+    @Override
+    public boolean resetUserPassword(UserDTO userDTO) {
+        Optional<User> optional = this.userRepository.findByEmail(userDTO.getEmail());
+
+        if (optional.isEmpty()) {
+            return false;
+        }
+        optional.get().setPassword(this.passwordEncoder.encode(userDTO.getPassword()));
+        this.userRepository.save(optional.get());
+
+        return true;
+    }
+
+    private void saveUser(User user) {
+        this.userRepository.save(user);
     }
 
     private UserProfileDTO mapToUserProfileDTO(User user) {

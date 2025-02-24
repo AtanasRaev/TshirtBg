@@ -1,5 +1,8 @@
 package bg.tshirt.database.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
+
 import java.util.List;
 
 public class OrderDTO {
@@ -7,8 +10,10 @@ public class OrderDTO {
 
     private String lastName;
 
+    @Email(message = "Invalid email format")
     private String email;
 
+    @Size(min = 16, max = 16, message = "Phone number must be 16 characters")
     private String phoneNumber;
 
     private String region;

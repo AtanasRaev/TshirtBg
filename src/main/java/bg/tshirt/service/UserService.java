@@ -17,9 +17,9 @@ public interface UserService {
 
     UserDTO validateUser(HttpServletRequest request);
 
-    void saveUser(User user);
-
     UserProfileDTO getUserProfile(HttpServletRequest request);
 
     List<String> getUserRoles(String accessToken);
+
+    boolean resetUserPassword(UserDTO userDTO);
 }

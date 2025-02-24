@@ -43,11 +43,18 @@ app:
   jwtSecret: ${JWT_SECRET}
   jwtExpirationInMs: ${JWT_EXPIRATION_TIME}
   jwtRefreshExpirationInMs: ${JWT_REFRESH_TIME}
+  passwordResetExpirationInMs: ${PASSWORD_RESET_EXPIRATION}
+  frontendUrl: ${FRONTEND_URL}
 cloud:
   cloudName: ${CLOUD_NAME}
-  apiKey: ${API_KEY}
-  apiSecret: ${API_SECRET}
+  apiKey: ${CLOUD_API_KEY}
+  apiSecret: ${CLOUD_API_SECRET}
 econt:
   api:
-    urlCities: https://ee.econt.com/services/Nomenclatures/NomenclaturesService.getCities.json
-    urlOffices: https://ee.econt.com/services/Nomenclatures/NomenclaturesService.getOffices.json
+    urlCities: ${ECONT_API_GET_CITIES}
+    urlOffices: ${ECONT_API_GET_OFFICES}
+mailjet:
+  api:
+    key: ${MAILJET_API_KEY}
+    secret: ${MAILJET_API_SECRET}
+    sender: ${SENDER_EMAIL}

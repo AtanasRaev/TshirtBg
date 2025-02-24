@@ -1,12 +1,6 @@
 package bg.tshirt.database.dto;
 
 import bg.tshirt.database.entity.enums.Gender;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 
 public class OrderItemDetailsDTO {
     private Long id;

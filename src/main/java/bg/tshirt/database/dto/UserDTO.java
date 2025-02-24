@@ -14,6 +14,9 @@ public class UserDTO {
     @JsonIgnore
     private Set<Role> roles;
 
+    @JsonIgnore
+    private String password;
+
     public UserDTO() {
         this.roles = new HashSet<>();
     }
@@ -46,5 +49,13 @@ public class UserDTO {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
