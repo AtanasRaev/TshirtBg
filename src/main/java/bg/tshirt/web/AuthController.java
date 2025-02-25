@@ -18,7 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
@@ -31,18 +30,15 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
     private final RefreshTokenServiceImpl refreshTokenService;
-    private final PasswordResetService passwordResetService;
 
     private final Map<String, Bucket> rateLimitBuckets = new ConcurrentHashMap<>();
 
     public AuthController(JwtTokenProvider jwtTokenProvider,
                           CustomUserDetailsService customUserDetailsService,
-                          RefreshTokenServiceImpl refreshTokenService,
-                          PasswordResetService passwordResetService) {
+                          RefreshTokenServiceImpl refreshTokenService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.customUserDetailsService = customUserDetailsService;
         this.refreshTokenService = refreshTokenService;
-        this.passwordResetService = passwordResetService;
     }
 
     @PostMapping("/refresh-token")
@@ -96,27 +92,6 @@ public class AuthController {
                     .body(Map.of("message", "Invalid refresh token"));
         }
     }
-
-    @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestParam("email") String email) {
-        this.passwordResetService.createPasswordResetToken(email);
-        return ResponseEntity.ok("If an account exists for that email, a reset link has been sent.");
-    }
-
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestParam("token") String token,
-                                           @RequestParam("newPassword") String newPassword) {
-        if (!this.passwordResetService.validatePasswordResetToken(token)) {
-            return ResponseEntity.badRequest().body("Invalid or expired token.");
-        }
-        boolean reset = this.passwordResetService.resetPassword(token, newPassword);
-        if (reset) {
-            return ResponseEntity.ok("Your password has been updated successfully.");
-        } else {
-            return ResponseEntity.badRequest().body("Password reset failed.");
-        }
-    }
-
     private boolean isRateLimitExceeded(HttpServletRequest httpRequest) {
         String clientIp = httpRequest.getRemoteAddr();
         Bucket bucket = resolveBucket(clientIp);

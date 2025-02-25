@@ -6,6 +6,7 @@ import bg.tshirt.database.repository.PasswordResetTokenRepository;
 import bg.tshirt.service.EmailService;
 import bg.tshirt.service.PasswordResetService;
 import bg.tshirt.service.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     }
 
     @Override
+    @Transactional
     public void createPasswordResetToken(String email) {
         UserDTO user = userService.findByEmail(email);
         if (user != null) {

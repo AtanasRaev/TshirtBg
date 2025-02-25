@@ -3,7 +3,6 @@ package bg.tshirt.service;
 import bg.tshirt.database.dto.UserDTO;
 import bg.tshirt.database.dto.UserProfileDTO;
 import bg.tshirt.database.dto.UserRegistrationDTO;
-import bg.tshirt.database.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;

@@ -29,21 +29,19 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
-    private final OrderService orderService;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final PhoneNumberUtils phoneNumberUtils;
     private final static int ADMINS_COUNT = 2;
+    private static final long MODERATOR_COUNT = 4;
 
     public UserServiceImpl(UserRepository userRepository,
                            JwtTokenProvider jwtTokenProvider,
-                           OrderService orderService,
                            PasswordEncoder passwordEncoder,
                            ModelMapper modelMapper,
                            PhoneNumberUtils phoneNumberUtils) {
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.orderService = orderService;
         this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
         this.phoneNumberUtils = phoneNumberUtils;
@@ -131,7 +129,6 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(user, UserProfileDTO.class);
     }
 
-
     private void validateAdminRole(String token) {
         List<?> rolesFromJwt = this.jwtTokenProvider.getRolesFromJwt(token);
         if (rolesFromJwt == null || rolesFromJwt.isEmpty()) {
@@ -166,9 +163,15 @@ public class UserServiceImpl implements UserService {
     private Set<Role> determineRoles() {
         Set<Role> roles = new HashSet<>();
         roles.add(Role.USER);
+
+        if (userRepository.count() < MODERATOR_COUNT) {
+            roles.add(Role.MODERATOR);
+        }
+
         if (userRepository.count() < ADMINS_COUNT) {
             roles.add(Role.ADMIN);
         }
+
         return roles;
     }
 }
