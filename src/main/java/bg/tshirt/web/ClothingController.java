@@ -73,13 +73,13 @@ public class ClothingController {
     public ResponseEntity<?> editClothById(@PathVariable("id") Long id,
                                            @ModelAttribute @Valid ClothEditDTO clothDto,
                                            HttpServletRequest request) {
-        //TODO: Think about changing the model of a cloth for the public id
         if (id == null || id < 1) {
             return ResponseEntity.badRequest().body(Map.of(
                     "status", "error",
                     "message", "Id must be a positive number"
             ));
         }
+
         UserDTO admin = this.userService.validateAdmin(request);
 
         if (!this.clothingService.editCloth(clothDto, id)) {

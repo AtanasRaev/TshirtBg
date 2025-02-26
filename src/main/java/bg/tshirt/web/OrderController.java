@@ -131,9 +131,9 @@ public class OrderController {
 
     private Page<OrderPageDTO> getListOrdersPage(Pageable pageable, String status, UserDTO userDTO) {
         if ("all".equalsIgnoreCase(status)) {
-            return userDTO.getRoles().contains(Role.ADMIN) ? this.orderService.getAllOrders(pageable) : this.orderService.findOrdersByUser(userDTO.getEmail(), pageable);
+            return userDTO.getRoles().contains(Role.ADMIN) || userDTO.getRoles().contains(Role.MODERATOR) ? this.orderService.getAllOrders(pageable) : this.orderService.findOrdersByUser(userDTO.getEmail(), pageable);
         } else {
-            return userDTO.getRoles().contains(Role.ADMIN) ? this.orderService.getAllOrdersByStatus(pageable, status) : Page.empty();
+            return userDTO.getRoles().contains(Role.ADMIN) || userDTO.getRoles().contains(Role.MODERATOR) ? this.orderService.getAllOrdersByStatus(pageable, status) : Page.empty();
         }
     }
 

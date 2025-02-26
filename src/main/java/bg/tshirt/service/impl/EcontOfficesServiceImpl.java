@@ -25,8 +25,7 @@ public class EcontOfficesServiceImpl implements EcontOfficesService {
 
     @Override
     public List<EcontOfficesDTO> getOffices(String name) {
-        String[] tokens = name.trim().split("[\\p{Punct}\\s]+");
-        ;
+        String[] tokens = name.trim().split("[\\p{Punct}\\s]+");;
 
         List<EcontCitiesDTO> matchedCities = filterCitiesByName(tokens[0]);
 
@@ -87,7 +86,8 @@ public class EcontOfficesServiceImpl implements EcontOfficesService {
                         for (String token : tokens) {
                             String tokenLower = token.toLowerCase();
                             String blok = "блок.".toLowerCase();
-                            if (tokenLower.contains(blok)) {
+                            String jk = "ж.к".toLowerCase();
+                            if (tokenLower.contains(blok) || tokenLower.contains(jk)) {
                                 String[] splitTokens = tokenLower.split("\\.");
                                 for (String part : splitTokens) {
                                     if (!addressLower.contains(part) && !addressEnLower.contains(part)) {
