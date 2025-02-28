@@ -2,7 +2,6 @@ package bg.tshirt.web;
 
 import bg.tshirt.config.JwtTokenProvider;
 import bg.tshirt.database.dto.TokenRefreshResponse;
-import bg.tshirt.service.PasswordResetService;
 import bg.tshirt.service.impl.CustomUserDetailsService;
 import bg.tshirt.service.impl.RefreshTokenServiceImpl;
 import io.github.bucket4j.Bandwidth;
